@@ -1,0 +1,30 @@
+{
+  "name": "ecomedu",
+  "private": true,
+  "version": "1.0.0",
+  "description": "EcomEdu - e-commerce learning platform (public portal, admin, teacher, backend)",
+  "workspaces": [
+    "shared",
+    "backend",
+    "public",
+    "admin",
+    "teacher"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,public,admin,teacher -c blue,green,magenta,yellow \"npm run dev -w backend\" \"npm run dev -w public\" \"npm run dev -w admin\" \"npm run dev -w teacher\"",
+    "dev:backend": "npm run dev -w backend",
+    "dev:public": "npm run dev -w public",
+    "dev:admin": "npm run dev -w admin",
+    "dev:teacher": "npm run dev -w teacher",
+    "dev:db": "npm run dev:db -w backend",
+    "seed": "npm run seed -w backend",
+    "build": "npm run build -w public && npm run build -w admin && npm run build -w teacher",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

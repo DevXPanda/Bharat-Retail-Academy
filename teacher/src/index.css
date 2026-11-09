@@ -1,0 +1,33 @@
+@import '../../shared/src/styles/base.css';
+@import '../../shared/src/styles/portal.css';
+
+.teacher-table-stack { display: flex; flex-direction: column; gap: 24px; margin-top: 24px; }
+.teacher-live-panels { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: stretch; gap: 24px; margin-top: 24px; }
+.teacher-live-panels > .card { display: flex; flex-direction: column; }
+.teacher-live-panels > .card > div { flex: 1; min-width: 0; }
+.teacher-profile-identity { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; padding: 24px; }
+.teacher-profile-identity h2 { font-size: 21px; font-weight: 650; letter-spacing: -.025em; }
+.teacher-profile-identity > div:last-child { align-self: center; flex-wrap: wrap; }
+.teacher-profile-sections { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; overflow: hidden; }
+.teacher-profile-sections > section.card { border: 0; border-radius: 0; border-bottom: 1px solid var(--portal-border); padding: 24px; }
+.teacher-profile-sections > section.card:nth-child(odd) { border-right: 1px solid var(--portal-border); }
+.teacher-profile-sections > section h3 { font-size: 14px; font-weight: 600; }
+.teacher-profile-sections > section header { gap: 14px; }
+.teacher-profile-sections > section h3 svg { width: 17px; height: 17px; color: #748ca8; }
+.teacher-profile-sections > section .text-\[14px\] { font-size: 12px; font-weight: 500; overflow-wrap: anywhere; }
+.teacher-profile-stats { margin-top: 24px; }
+.teacher-profile-form-row > * { min-width: 0; }
+.teacher-earnings-workspace > .portal-insights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 1023px) { .teacher-earnings-workspace > .portal-insights { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 1023px) { .teacher-live-panels { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 639px) {
+  .teacher-table-stack, .teacher-live-panels { gap: 18px; }
+  .teacher-profile-identity { padding: 20px 16px; }
+  .teacher-profile-sections { grid-template-columns: minmax(0, 1fr); }
+  .teacher-profile-sections > section.card { padding: 20px 16px; }
+  .teacher-profile-sections > section.card:nth-child(odd) { border-right: 0; }
+  .teacher-profile-form-row { grid-template-columns: minmax(0, 1fr) !important; }
+  .teacher-roster-actions { align-items: flex-start; flex-direction: column; }
+  .teacher-schedule-row { flex-wrap: wrap; }
+  .teacher-schedule-row > div:last-child { flex-direction: row; flex-wrap: wrap; align-items: center; width: 100%; }
+}

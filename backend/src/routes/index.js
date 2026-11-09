@@ -1,0 +1,58 @@
+import { Router } from 'express';
+import authRoutes from '../modules/auth/auth.routes.js';
+import studentsRoutes from '../modules/students/students.routes.js';
+import teachersRoutes from '../modules/teachers/teachers.routes.js';
+import coursesRoutes from '../modules/courses/courses.routes.js';
+import batchesRoutes from '../modules/batches/batches.routes.js';
+import liveClassesRoutes from '../modules/liveClasses/liveClasses.routes.js';
+import recordingsRoutes from '../modules/recordings/recordings.routes.js';
+import attendanceRoutes from '../modules/attendance/attendance.module.js';
+import certificatesRoutes from '../modules/certificates/certificates.module.js';
+import paymentsRoutes from '../modules/payments/payments.module.js';
+import payoutsRoutes from '../modules/payouts/payouts.module.js';
+import { announcementsRouter, conversationsRouter } from '../modules/messages/messages.module.js';
+import notificationsRoutes from '../modules/notifications/notifications.module.js';
+import { filesRouter, uploadsRouter } from '../modules/uploads/uploads.module.js';
+import learningRoutes from '../modules/learning/learning.module.js';
+import assignmentsRoutes from '../modules/assignments/assignments.module.js';
+import dashboardRoutes from '../modules/dashboard/dashboard.module.js';
+import reportsRoutes from '../modules/reports/reports.module.js';
+import publicRoutes from '../modules/public/public.module.js';
+import ticketsRoutes from '../modules/tickets/tickets.module.js';
+import { blogRouter } from '../modules/blog/blog.module.js';
+import leadsRoutes from '../modules/leads/leads.module.js';
+import reviewsRoutes from '../modules/reviews/reviews.module.js';
+import settingsRoutes from '../modules/settings/settings.module.js';
+
+const router = Router();
+
+router.get('/health', (_req, res) => res.json({ success: true, status: 'ok', time: new Date().toISOString() }));
+
+router.use('/auth', authRoutes);
+router.use('/public', publicRoutes);
+router.use('/dashboard', dashboardRoutes);
+router.use('/students', studentsRoutes);
+router.use('/teachers', teachersRoutes);
+router.use('/courses', coursesRoutes);
+router.use('/batches', batchesRoutes);
+router.use('/live-classes', liveClassesRoutes);
+router.use('/recordings', recordingsRoutes);
+router.use('/attendance', attendanceRoutes);
+router.use('/certificates', certificatesRoutes);
+router.use('/payments', paymentsRoutes);
+router.use('/payouts', payoutsRoutes);
+router.use('/conversations', conversationsRouter);
+router.use('/announcements', announcementsRouter);
+router.use('/notifications', notificationsRoutes);
+router.use('/uploads', uploadsRouter);
+router.use('/files', filesRouter);
+router.use('/learning', learningRoutes);
+router.use('/assignments', assignmentsRoutes);
+router.use('/reports', reportsRoutes);
+router.use('/tickets', ticketsRoutes);
+router.use('/blog', blogRouter);
+router.use('/leads', leadsRoutes);
+router.use('/reviews', reviewsRoutes);
+router.use('/settings', settingsRoutes);
+
+export default router;

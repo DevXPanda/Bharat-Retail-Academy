@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { BRAND, ProtectedRoute, StaffLogin, useGet } from '@ecomedu/ui';
+import { BRAND, ProtectedRoute, StaffForgotPassword, StaffLogin, StaffResetPassword } from '@ecomedu/ui';
 import PortalLayout from './components/PortalLayout.jsx';
 import { NAV } from './nav.js';
 import Dashboard from './pages/Dashboard.jsx';
@@ -25,11 +25,7 @@ import PlatformSettings from './pages/PlatformSettings.jsx';
 const PORTAL = { name: BRAND.name, caption: 'Admin Portal' };
 
 function Shell() {
-  const summary = useGet('/conversations/summary', undefined, { refetchInterval: 60000 });
-  const tickets = useGet('/tickets/summary', undefined, { refetchInterval: 60000 });
-  const leads = useGet('/leads/summary', undefined, { refetchInterval: 60000 });
-  const badges = { '/messages': summary.data?.unread?.value || 0, '/support': tickets.data?.open?.value || 0, '/leads': leads.data?.new?.value || 0 };
-  return <PortalLayout brand={PORTAL} nav={NAV} badges={badges} />;
+  return <PortalLayout brand={PORTAL} nav={NAV} />;
 }
 
 export default function App() {
@@ -40,12 +36,15 @@ export default function App() {
         element={
           <StaffLogin
             brand={PORTAL}
+            forgotPath="/forgot-password"
             heading="Admin sign in"
             tagline="Manage your academy."
             points={['Students, teachers and courses', 'Classes and attendance', 'Payments and reports']}
           />
         }
       />
+      <Route path="/forgot-password" element={<StaffForgotPassword brand={PORTAL} />} />
+      <Route path="/reset-password" element={<StaffResetPassword brand={PORTAL} />} />
       <Route element={<ProtectedRoute />}>
         <Route element={<Shell />}>
           <Route index element={<Dashboard />} />

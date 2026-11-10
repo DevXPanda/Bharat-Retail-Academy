@@ -6,7 +6,6 @@ import logoSmall from '../../logo/logo-small.png';
 export const BRAND = {
   name: 'Bharat Retail Academy',
   short: 'Bharat Retail',
-  tagline: 'Learn | Apply | Grow | Sell Online',
 };
 
 export const BRAND_LOGO = logoLarge;

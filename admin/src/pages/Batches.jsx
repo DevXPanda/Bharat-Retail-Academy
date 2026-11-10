@@ -187,9 +187,9 @@ export default function Batches() {
   ];
 
   const donut = [
-    { name: 'Active', value: summary?.active.value || 0, color: '#22c55e' },
-    { name: 'Upcoming', value: summary?.upcoming.value || 0, color: '#2f6df3' },
-    { name: 'Completed', value: summary?.completed.value || 0, color: '#8b5cf6' },
+    { name: 'Active', value: summary?.active.value || 0, color: '#2d725e' },
+    { name: 'Upcoming', value: summary?.upcoming.value || 0, color: '#2563eb' },
+    { name: 'Completed', value: summary?.completed.value || 0, color: '#44597a' },
     { name: 'Draft', value: summary?.draft.value || 0, color: '#f59e0b' },
   ];
 

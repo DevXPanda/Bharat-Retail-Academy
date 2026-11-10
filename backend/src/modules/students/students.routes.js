@@ -9,6 +9,7 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/roster', authorize('admin', 'teacher'), validate({ query: rosterQuery }), controller.roster);
+router.get('/roster/export', authorize('admin', 'teacher'), controller.exportRoster);
 router.get('/roster/summary', authorize('admin', 'teacher'), controller.rosterSummary);
 router.get('/roster/groups', authorize('admin', 'teacher'), validate({ query: groupsQuery }), controller.rosterGroups);
 

@@ -1,6 +1,7 @@
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { ProtectedRoute } from '@ecomedu/ui';
+import { ProtectedRoute, useAuth } from '@ecomedu/ui';
+import { AuthModalProvider, useAuthModal } from './components/AuthModal.jsx';
 import PublicLayout from './components/PublicLayout.jsx';
 import Home from './pages/Home.jsx';
 import Courses from './pages/Courses.jsx';
@@ -11,7 +12,6 @@ import { Contact, VerifyCertificate } from './pages/ContactVerify.jsx';
 import Legal from './pages/Legal.jsx';
 import JoinClass from './pages/JoinClass.jsx';
 import TeacherDetail from './pages/TeacherDetail.jsx';
-import { Login, Signup } from './pages/AuthPages.jsx';
 import StudentShell from './student/StudentShell.jsx';
 import Dashboard from './student/Dashboard.jsx';
 import MyCourses from './student/MyCourses.jsx';
@@ -29,9 +29,29 @@ function ScrollToTop() {
   return null;
 }
 
+// /login, /signup and friends are no longer pages: they open the popup over the page the visitor came from.
+// Links in old emails (reset password) and protected pages still land here.
+function OpenAuth({ view }) {
+  const { open } = useAuthModal();
+  const { user } = useAuth();
+  const [params] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const next = params.get('next') || location.state?.from || '';
+    if (user && view !== 'reset') {
+      navigate(next || '/app', { replace: true });
+      return;
+    }
+    open(view, { next: next || undefined, token: params.get('token') || undefined, email: params.get('email') || undefined });
+    navigate(next && !next.startsWith('/app') ? next : '/', { replace: true });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  return null;
+}
+
 export default function App() {
   return (
-    <>
+    <AuthModalProvider>
       <ScrollToTop />
       <Routes>
         <Route element={<PublicLayout />}>
@@ -51,8 +71,10 @@ export default function App() {
           <Route path="join/:id" element={<JoinClass />} />
           <Route path="verify" element={<VerifyCertificate />} />
           <Route path="verify/:id" element={<VerifyCertificate />} />
-          <Route path="login" element={<Login />} />
-          <Route path="signup" element={<Signup />} />
+          <Route path="login" element={<OpenAuth view="login" />} />
+          <Route path="signup" element={<OpenAuth view="signup" />} />
+          <Route path="forgot-password" element={<OpenAuth view="forgot" />} />
+          <Route path="reset-password" element={<OpenAuth view="reset" />} />
         </Route>
 
         <Route path="app" element={<ProtectedRoute redirectTo="/login" />}>
@@ -72,6 +94,6 @@ export default function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </>
+    </AuthModalProvider>
   );
 }

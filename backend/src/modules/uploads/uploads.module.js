@@ -6,13 +6,15 @@ import { ApiError } from '../../utils/ApiError.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { created } from '../../utils/response.js';
 import { findFile, getBucket, toObjectId } from '../../services/gridfs.js';
+import { uploadLimiter } from '../../middleware/security.js';
+import { verifyFileSignature } from '../../services/fileLinks.js';
 import { compressImage, enqueueVideo, storeBuffer } from '../../services/media.js';
 
 export const fileUrl = (id, name) => `${env.PUBLIC_API_URL}/api/v1/files/${id}/${encodeURIComponent(name || 'file')}`;
 
 // Upload (login required): stores the file in MongoDB and returns a link to it.
 export const uploadsRouter = Router();
-uploadsRouter.use(authenticate);
+uploadsRouter.use(authenticate, uploadLimiter);
 
 uploadsRouter.post('/:kind', (req, res, next) => {
   const { kind } = req.params;
@@ -51,13 +53,18 @@ filesRouter.get(
     const file = await findFile(req.params.id);
     if (!file) throw ApiError.notFound('File not found');
 
+    // Images (avatars, thumbnails, logos) are public; videos and documents need a signed, expiring link.
+    const isImage = String(file.contentType || '').startsWith('image/');
+    if (!isImage && !verifyFileSignature(req.params.id, req.query.exp, req.query.sig)) throw ApiError.notFound('File not found');
+    const inline = isImage || /^(video\/|application\/pdf)/.test(file.contentType || '');
+
     const etag = `"${file._id}"`;
     res.set({
       'Content-Type': file.contentType || 'application/octet-stream',
       'Accept-Ranges': 'bytes',
       ETag: etag,
-      'Cache-Control': 'public, max-age=31536000, immutable',
-      'Content-Disposition': `inline; filename*=UTF-8''${encodeURIComponent(file.filename)}`,
+      'Cache-Control': isImage ? 'public, max-age=31536000, immutable' : 'private, max-age=3600',
+      'Content-Disposition': `${inline ? 'inline' : 'attachment'}; filename*=UTF-8''${encodeURIComponent(file.filename)}`,
       'Cross-Origin-Resource-Policy': 'cross-origin',
     });
     if (req.headers['if-none-match'] === etag) return res.status(304).end();

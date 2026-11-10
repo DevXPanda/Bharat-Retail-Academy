@@ -1,5 +1,6 @@
 @import '../../shared/src/styles/base.css';
 @import '../../shared/src/styles/portal.css';
+@import '../../shared/src/styles/roles.css';
 
 .teacher-table-stack { display: flex; flex-direction: column; gap: 24px; margin-top: 24px; }
 .teacher-live-panels { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: stretch; gap: 24px; margin-top: 24px; }
@@ -13,7 +14,7 @@
 .teacher-profile-sections > section.card:nth-child(odd) { border-right: 1px solid var(--portal-border); }
 .teacher-profile-sections > section h3 { font-size: 14px; font-weight: 600; }
 .teacher-profile-sections > section header { gap: 14px; }
-.teacher-profile-sections > section h3 svg { width: 17px; height: 17px; color: #748ca8; }
+.teacher-profile-sections > section h3 svg { width: 17px; height: 17px; color: #798ba3; }
 .teacher-profile-sections > section .text-\[14px\] { font-size: 12px; font-weight: 500; overflow-wrap: anywhere; }
 .teacher-profile-stats { margin-top: 24px; }
 .teacher-profile-form-row > * { min-width: 0; }

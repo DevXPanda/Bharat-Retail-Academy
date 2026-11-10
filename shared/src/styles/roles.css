@@ -1,0 +1,153 @@
+/*
+  Role layers on top of the shared design system.
+  One brand everywhere, a different working feel per role:
+    Public + Student  light and calm, Soft Sage surfaces, Royal Blue actions
+    Admin             Midnight Navy sidebar, Royal Blue active state, dense data layouts
+    Teacher           Midnight Navy sidebar with Sage Green identity and a sage-tinted canvas
+  `:root` is prefixed on purpose so these win over the older per-app rules without !important.
+*/
+
+/* ---------- shared polish for every portal ---------- */
+:root body:has(.admin-portal) { background: var(--canvas); }
+:root .admin-portal { background: var(--canvas); color: var(--text); }
+:root .admin-portal .card { border-color: var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+:root .admin-portal main h1, :root .portal-page-header h1 { font-family: var(--font-display); color: var(--navy); font-weight: 700; letter-spacing: -0.02em; }
+:root .portal-page-header > div > p { color: var(--muted); font-size: 13.5px; }
+:root .portal-panel-heading h3, :root .admin-portal .card > header h3 { font-family: var(--font-display); color: var(--navy); }
+:root .portal-breadcrumb { color: var(--muted); font-size: 11px; }
+
+/* stat cards: a tinted icon tile, display numerals, gentle lift when clickable */
+:root .portal-stat { border-radius: var(--radius-lg); transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease; }
+:root button.portal-stat:hover, :root a.portal-stat:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); border-color: #c8d5e6; }
+:root .portal-stat strong { font-family: var(--font-display); color: var(--navy); font-size: 28px; }
+:root .portal-stat-top > p { color: var(--muted); font-weight: 500; }
+:root .admin-portal .portal-stat-top svg { box-sizing: content-box; width: 18px; height: 18px; margin: -6px -6px 0 0; padding: 9px; border-radius: 12px; background: var(--tile-bg, var(--royal-soft)); color: var(--tile-fg, var(--royal)); stroke-width: 1.8; }
+.portal-tone-blue { --tile-bg: #e3efe8; --tile-fg: var(--royal); }
+.portal-tone-green { --tile-bg: var(--sage-soft); --tile-fg: var(--sage); }
+.portal-tone-purple { --tile-bg: #e6ebf3; --tile-fg: #44597a; }
+.portal-tone-orange, .portal-tone-amber { --tile-bg: #fdf3e1; --tile-fg: #a96a14; }
+.portal-tone-red { --tile-bg: #fdeceb; --tile-fg: #c2413b; }
+.portal-tone-pink { --tile-bg: #f8ebf2; --tile-fg: #a8477c; }
+
+/* tables: quiet header, sage-tinted row hover, clear selected state */
+:root .portal-table-scroll thead { background: var(--canvas); }
+:root .portal-table-scroll th { color: var(--muted); border-color: var(--border-soft); }
+:root .portal-table-scroll td { color: var(--text-2); border-color: var(--border-soft); }
+:root .portal-table-scroll td .font-semibold:not(button):not(a), :root .portal-table-scroll td .font-bold:not(button):not(a) { color: var(--navy); }
+:root .portal-table-scroll tbody tr { transition: background .12s ease; }
+:root .portal-table-scroll tbody tr:hover { background: #f3f7f4; }
+:root .portal-table-scroll tbody tr.is-selected { background: var(--royal-soft); }
+:root .portal-view-all { color: var(--royal); font-weight: 600; }
+:root .portal-view-all:hover { color: var(--royal-dark); }
+
+/* forms, drawers, tabs */
+:root .admin-portal .field-input, :root .portal-drawer .field-input { border-color: #d8e0ea; border-radius: 10px; font-size: 13px; background: #fff; }
+:root .admin-portal .field-input:focus, :root .portal-drawer .field-input:focus { border-color: var(--royal); box-shadow: var(--ring); }
+:root .portal-drawer { box-shadow: -16px 0 48px rgba(20, 36, 58, .18); }
+:root .portal-drawer-overlay { background: rgba(20, 36, 58, .45); backdrop-filter: blur(2px); }
+:root .portal-drawer-heading h2 { font-family: var(--font-display); color: var(--navy); font-weight: 700; }
+:root .portal-drawer-footer { background: var(--canvas); }
+:root .admin-portal [role=tab] { color: var(--muted); }
+:root .admin-portal [role=tab][aria-selected=true] { color: var(--royal); }
+
+/* topbar */
+:root .admin-topbar { background: rgba(255, 255, 255, .92); backdrop-filter: saturate(160%) blur(12px); border-bottom: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+:root .admin-global-search { background: var(--canvas); border-color: var(--border); border-radius: 12px; }
+:root .admin-global-search:focus-within { background: #fff; border-color: var(--royal); outline: 0; box-shadow: var(--ring); }
+:root .admin-menu-toggle:hover { background: var(--sage-soft); }
+
+/* ---------- sidebar brand (shared) ---------- */
+:root .admin-brand { height: auto; min-height: 78px; padding: 14px 18px; gap: 11px; }
+:root .admin-brand > span:last-child > span:first-child { font-family: var(--font-display); font-size: 15.5px; line-height: 1.18; font-weight: 800; letter-spacing: -0.01em; }
+:root .admin-brand > span:last-child > span:last-child { margin-top: 4px; font-size: 11px; letter-spacing: .02em; }
+:root .admin-nav-link { border-radius: 10px; font-size: 12.5px; transition: background .15s ease, color .15s ease, box-shadow .15s ease; }
+:root .admin-nav-group > p { letter-spacing: .1em; }
+
+/* ---------- ADMIN: Midnight Navy + Royal Blue ---------- */
+:root .admin-sidebar, :root .admin-drawer { background: var(--navy); }
+:root .admin-nav-link:hover:not(.is-active) { background: rgba(255, 255, 255, .07); color: #fff; }
+:root .admin-nav-link.is-active { background: var(--sage); color: #fff; box-shadow: 0 8px 18px -10px rgba(45, 114, 94, .8); font-weight: 600; }
+:root .admin-nav-link.is-active > svg { color: #fff; }
+:root .admin-nav-group > p { color: #8095b0; }
+:root .admin-brand > span:last-child > span:last-child { color: #9db0c8; }
+
+/* ---------- TEACHER: sage identity ---------- */
+:root .teacher-portal .admin-portal { background: linear-gradient(180deg, var(--sage-soft) 0, var(--canvas) 360px) no-repeat; }
+:root body:has(.teacher-portal) { background: var(--canvas); }
+:root .teacher-portal .admin-sidebar, :root .teacher-portal .admin-drawer { background: linear-gradient(180deg, #16293f 0%, var(--navy) 55%, #101d2e 100%); }
+:root .teacher-portal .admin-nav-link.is-active { background: var(--sage); box-shadow: 0 8px 20px -8px rgba(45, 114, 94, .85); }
+:root .teacher-portal .admin-nav-group > p { color: #8fb7a3; }
+:root .teacher-portal .admin-brand > span:last-child > span:last-child { color: #9fcbb7; }
+:root .teacher-portal .admin-topbar { border-bottom-color: #d6e4db; }
+:root .teacher-portal .portal-tone-blue { --tile-bg: var(--sage-soft); --tile-fg: var(--sage); }
+:root .teacher-portal .portal-view-all { color: var(--sage); }
+:root .teacher-portal .portal-view-all:hover { color: var(--sage-dark); }
+:root .teacher-portal .admin-portal [role=tab][aria-selected=true] { color: var(--sage); }
+:root .teacher-portal .portal-table-scroll tbody tr:hover { background: #f0f6f2; }
+:root .teacher-portal .admin-global-search:focus-within { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(45, 114, 94, .2); }
+
+/* ---------- STUDENT: light, learner-friendly ---------- */
+:root .student-portal { background: var(--canvas); color: var(--text); }
+:root .student-portal .admin-portal { background: linear-gradient(180deg, var(--sage-soft) 0, var(--canvas) 300px) no-repeat; }
+:root .student-portal .card { border-color: var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); }
+:root .student-portal .admin-sidebar, :root .student-portal .admin-drawer { background: #fff; color: var(--text-2); border-right: 1px solid #d6e4db; }
+:root .student-portal .admin-brand { border-bottom: 1px solid var(--border); }
+:root .student-portal .admin-brand > span:last-child > span:first-child { color: var(--navy); }
+:root .student-portal .admin-brand > span:last-child > span:last-child { color: var(--sage); font-weight: 600; }
+:root .student-portal .admin-nav-group > p { color: #94a3b8; }
+:root .student-portal .admin-nav-link { color: var(--text-2); }
+:root .student-portal .admin-nav-link > svg { color: #7a8ba3; }
+:root .student-portal .admin-nav-link:hover:not(.is-active) { background: var(--sage-soft); color: var(--navy); }
+:root .student-portal .admin-nav-link.is-active { background: var(--royal-soft); color: var(--royal); box-shadow: inset 3px 0 0 var(--royal); font-weight: 650; }
+:root .student-portal .admin-nav-link.is-active > svg { color: var(--royal); }
+:root .student-portal .admin-sidebar-footer { border-top: 1px solid var(--border); }
+:root .student-portal .admin-sidebar-footer button { color: var(--text-2); }
+:root .student-portal .admin-sidebar-footer button:hover { background: var(--sage-soft); color: var(--navy); }
+:root .student-portal .admin-drawer-close { color: var(--text-2); }
+
+/* ---------- PUBLIC website ---------- */
+:root .public-site { background: var(--canvas); color: var(--text); }
+:root .public-site h1:not([class*="text-"]), :root .public-site h2:not([class*="text-"]), :root .public-site h3:not([class*="text-"]) { font-family: var(--font-display); color: var(--navy); letter-spacing: -0.02em; }
+:root .home-hero { background: var(--sage-soft); border-bottom-color: #dbe7df; }
+:root .course-card { border-radius: var(--radius-lg); border-color: var(--border); box-shadow: var(--shadow-sm); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+:root .course-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); border-color: #bcd3c6; }
+:root .navbar-link.active, :root .navbar-course-link.active { background: var(--royal-soft); color: var(--royal); }
+:root .public-primary { box-shadow: 0 6px 16px -8px rgba(45, 114, 94, .7); transition: background .15s ease, transform .15s ease, box-shadow .15s ease; }
+:root .public-primary:hover { transform: translateY(-1px); box-shadow: 0 10px 22px -10px rgba(45, 114, 94, .8); }
+:root .public-primary:active { transform: translateY(0); }
+:root .public-secondary { border-color: #cdd9d2; background: #fff; }
+:root .public-secondary:hover { border-color: var(--sage); color: var(--sage); }
+:root .hero-copy h1 span { color: var(--sage); }
+
+/* ---------- Option C: Soft Sage sidebar, Sage Green active state and actions (all portals) ---------- */
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-sidebar,
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-drawer { background: var(--sage-soft); color: var(--text-2); border-right: 1px solid var(--border); }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-brand { height: 72px; min-height: 72px; padding: 0 18px; gap: 10px; border-bottom: 1px solid #d6e4db; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-topbar { height: 72px; border-bottom: 0; box-shadow: 0 1px 0 var(--border); }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-brand > span:last-child { min-width: 0; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-brand > span:last-child > span:first-child { font-size: 13.5px; line-height: 1.2; font-weight: 700; white-space: nowrap; color: var(--navy); letter-spacing: 0; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-brand > span:last-child > span:last-child { margin-top: 2px; font-size: 10.5px; color: var(--sage); font-weight: 600; letter-spacing: .03em; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-nav-group > p { color: #6f8a7e; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-nav-link { color: var(--text-2); font-weight: 500; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-nav-link > svg { color: #6f8a7e; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-nav-link:hover:not(.is-active) { background: #e1ece5; color: var(--navy); }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-nav-link:hover:not(.is-active) > svg { color: var(--navy); }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-nav-link.is-active { background: var(--sage); color: #fff; box-shadow: 0 8px 18px -10px rgba(45, 114, 94, .8); font-weight: 600; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-nav-link.is-active > svg { color: #fff; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-sidebar-footer { border-top: 1px solid #d6e4db; }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-sidebar-footer button { color: var(--text-2); }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-sidebar-footer button:hover { background: #e1ece5; color: var(--navy); }
+:root :is(.admin-portal, .student-portal, .teacher-portal) .admin-drawer-close { color: var(--text-2); }
+/* one blue family for actions in every portal */
+:root .teacher-portal .portal-tone-blue { --tile-bg: #e3efe8; --tile-fg: var(--royal); }
+:root .teacher-portal .portal-view-all { color: var(--royal); }
+:root .teacher-portal .admin-portal [role=tab][aria-selected=true] { color: var(--royal); }
+:root .teacher-portal .admin-global-search:focus-within { border-color: var(--royal); box-shadow: var(--ring); }
+@media (max-width: 760px) { :root :is(.admin-portal, .student-portal, .teacher-portal) .admin-topbar { height: 64px; } }
+
+/* solid action buttons: always white, bold text on sage / red; badges stay crisp */
+:root .bg-brand-600, :root .bg-emerald-600, :root .bg-red-600, :root .bg-brand-700 { color: #fff; font-weight: 600; letter-spacing: .005em; }
+:root .bg-brand-600:hover:not(:disabled) { background: var(--sage-dark); }
+:root .bg-brand-600 svg, :root .bg-emerald-600 svg { color: #fff; stroke-width: 2.2; }
+:root .portal-table-scroll td button.bg-brand-600, :root .portal-table-scroll td button.bg-emerald-600, :root .portal-table-scroll td button.bg-red-600 { color: #fff; }
+:root .portal-table-scroll td button.bg-brand-100 { color: var(--sage-dark); font-weight: 650; }

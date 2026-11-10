@@ -91,7 +91,7 @@ export default function Earnings() {
           {tab === 'history' && (<><DataTable columns={historyColumns} rows={payouts.data || []} loading={payouts.isLoading} minWidth={900} empty={<p className="py-10 text-center text-sm text-slate-500">No payouts yet.</p>} /><TableFooter meta={payouts.meta} noun="payouts" onPage={list.setPage} pageSize={list.pageSize} onPageSize={list.setPageSize} /></>)}
           {tab === 'details' && <DataTable columns={detailColumns} rows={rows} minWidth={760} empty={<p className="py-10 text-center text-sm text-slate-500">No completed classes yet.</p>} />}
           {tab === 'course' && <DataTable columns={courseColumns} rows={rows} minWidth={520} />}
-          {tab === 'monthly' && (<><DataTable columns={monthlyColumns} rows={rows} rowKey={(r) => r.id} minWidth={640} /><div className="p-5"><BarsChart data={[...rows].reverse()} xKey="month" currency series={[{ key: 'earnings', label: 'Earnings', color: '#2f6df3' }, { key: 'net', label: 'Net', color: '#22c55e' }]} /></div></>)}
+          {tab === 'monthly' && (<><DataTable columns={monthlyColumns} rows={rows} rowKey={(r) => r.id} minWidth={640} /><div className="p-5"><BarsChart data={[...rows].reverse()} xKey="month" currency series={[{ key: 'earnings', label: 'Earnings', color: '#2563eb' }, { key: 'net', label: 'Net', color: '#2d725e' }]} /></div></>)}
         </TableCard>
 </PortalWorkspace>
 

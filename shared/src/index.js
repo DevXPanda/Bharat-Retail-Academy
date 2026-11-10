@@ -3,6 +3,7 @@ export * from './lib/tones.js';
 export * from './lib/pricing.js';
 export * from './lib/client.js';
 export * from './hooks/index.js';
+export * from './hooks/notifications.js';
 export * from './context/AppProviders.jsx';
 
 export * from './components/ui/Button.jsx';
@@ -32,6 +33,7 @@ export * from './components/domain/ClassForm.jsx';
 export * from './components/domain/Brands.jsx';
 export * from './components/domain/Cells.jsx';
 export * from './components/domain/TicketThread.jsx';
+export * from './components/domain/TicketComposer.jsx';
 export * from './components/domain/AttendanceManager.jsx';
 export * from './components/domain/ClassJoinLink.jsx';
 export * from './components/domain/Editors.jsx';

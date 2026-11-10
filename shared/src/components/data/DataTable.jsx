@@ -3,8 +3,10 @@ import { cx } from '../../lib/format.js';
 import { Checkbox, Select } from '../ui/Form.jsx';
 import { EmptyState, ErrorState, Spinner } from '../ui/Display.jsx';
 import { Popover } from '../ui/Popover.jsx';
+import { useRowHighlight } from '../../hooks/notifications.js';
 
 export function DataTable({ columns, rows = [], rowKey = (r) => r.id, selectable, selected = [], onSelectedChange, loading, error, onRetry, empty, onRowClick, className, minWidth = 760 }) {
+  const { isUnread, markRead } = useRowHighlight();
   const allSelected = rows.length > 0 && rows.every((r) => selected.includes(rowKey(r)));
   const toggleAll = (checked) => onSelectedChange?.(checked ? rows.map(rowKey) : []);
   const toggleOne = (id, checked) => onSelectedChange?.(checked ? [...selected, id] : selected.filter((s) => s !== id));
@@ -32,7 +34,7 @@ export function DataTable({ columns, rows = [], rowKey = (r) => r.id, selectable
             rows.map((row, index) => {
               const id = rowKey(row);
               return (
-                <tr key={id} onClick={onRowClick ? () => onRowClick(row) : undefined} className={cx('border-b border-slate-100 last:border-0 transition hover:bg-slate-50/70', onRowClick && 'cursor-pointer', selected.includes(id) && 'bg-brand-50/50')}>
+                <tr key={id} onClick={isUnread(id) || onRowClick ? () => { markRead(id); onRowClick?.(row); } : undefined} className={cx('border-b border-slate-100 last:border-0 transition hover:bg-slate-50/70', onRowClick && 'cursor-pointer', selected.includes(id) && 'bg-brand-50/50', isUnread(id) && 'is-new')}>
                   {selectable && (
                     <td className="w-10 px-3">
                       <Checkbox checked={selected.includes(id)} onChange={(c) => toggleOne(id, c)} aria-label="Select row" />

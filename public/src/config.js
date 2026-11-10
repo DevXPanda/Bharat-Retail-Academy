@@ -3,7 +3,7 @@ export const HERO_IMAGE = null;
 
 export const GOALS = ['Start selling on Amazon', 'Start selling on Flipkart', 'Build a Shopify store', 'Learn digital marketing', 'Find products to sell', 'Grow my existing business'];
 
-export const SUPPORT_EMAIL = 'support@ecomedu.in';
+export const SUPPORT_EMAIL = 'support@bharatretailacademy.com';
 export const SUPPORT_PHONE = '+91 98765 43210';
 export const SUPPORT_HOURS = 'Mon - Sat, 10:00 AM - 7:00 PM IST';
 export const ADDRESS = 'Bharat Retail Academy, Connaught Place, New Delhi - 110001, India';

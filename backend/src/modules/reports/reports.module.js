@@ -4,7 +4,7 @@ import { authenticate, authorize } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { ok } from '../../utils/response.js';
-import { sendCsv } from '../../utils/csv.js';
+import { sendExcel } from '../../utils/excel.js';
 import * as service from './reports.service.js';
 
 const thisYear = new Date().getFullYear();
@@ -28,22 +28,22 @@ router.get(
   asyncHandler(async (req, res) => {
     const monthly = req.query.type === 'monthly';
     const { rows } = monthly ? await service.monthlyReport(req.query.year) : await service.yearlyReport(req.query.from, req.query.to);
-    sendCsv(
-      res,
-      `${req.query.type}-report.csv`,
-      [
-        { label: monthly ? 'Month' : 'Year', value: (r) => (monthly ? r.month : r.year) },
-        { label: 'New Students', value: (r) => r.newStudents },
-        { label: 'Top Course', value: (r) => r.topCourse },
-        { label: 'Payments', value: (r) => r.payments },
-        { label: 'GST', value: (r) => r.gst },
-        { label: 'Total Classes', value: (r) => r.classes },
-        { label: 'Teacher Payouts', value: (r) => r.teacherPayouts },
-        { label: 'Refunds', value: (r) => r.refunds },
-        { label: 'Net Revenue', value: (r) => r.net },
-      ],
+    await sendExcel(res, {
+      filename: `${req.query.type}-report.xlsx`,
+      title: monthly ? `Monthly payment & revenue report - ${req.query.year}` : 'Yearly payment & revenue report',
       rows,
-    );
+      columns: [
+        { label: monthly ? 'Month' : 'Year', value: (r) => (monthly ? r.month : r.year) },
+        { label: 'New Students', value: (r) => r.newStudents, format: 'number', total: true },
+        { label: 'Top Course', value: (r) => r.topCourse },
+        { label: 'Payments', value: (r) => r.payments, format: 'currency', total: true },
+        { label: 'GST', value: (r) => r.gst, format: 'currency', total: true },
+        { label: 'Total Classes', value: (r) => r.classes, format: 'number', total: true },
+        { label: 'Teacher Payouts', value: (r) => r.teacherPayouts, format: 'currency', total: true },
+        { label: 'Refunds', value: (r) => r.refunds, format: 'currency', total: true },
+        { label: 'Net Revenue', value: (r) => r.net, format: 'currency', total: true },
+      ],
+    });
   }),
 );
 

@@ -7,6 +7,8 @@ import env from './config/env.js';
 import routes from './routes/index.js';
 import { errorHandler, notFound } from './middleware/error.js';
 import { webhookHandler } from './modules/payments/payments.module.js';
+import { apiLimiter, sanitizeInput } from './middleware/security.js';
+import { signResponses, stripSignedLinks } from './services/fileLinks.js';
 
 const app = express();
 
@@ -19,7 +21,7 @@ if (!env.isProd) app.use(morgan('dev'));
 app.post('/api/v1/payments/webhook', express.raw({ type: 'application/json', limit: '1mb' }), webhookHandler);
 
 app.use(express.json({ limit: '1mb' }));
-app.use('/api/v1', routes);
+app.use('/api/v1', apiLimiter, sanitizeInput, stripSignedLinks, signResponses, routes);
 
 app.use(notFound);
 app.use(errorHandler);

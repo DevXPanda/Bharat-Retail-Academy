@@ -1,5 +1,5 @@
 import { Conversation, Message } from '../../models/Message.js';
-import { Announcement } from '../../models/Engagement.js';
+import { Announcement, Notification } from '../../models/Engagement.js';
 import Enrollment from '../../models/Enrollment.js';
 import Attendance from '../../models/Attendance.js';
 import Batch from '../../models/Batch.js';
@@ -12,7 +12,10 @@ import { emitToUser, isOnline } from '../../services/realtime.js';
 import { notifyUsers } from '../../services/notify.js';
 import { teacherStudentIds } from '../../services/scope.js';
 
-const USER_FIELDS = 'name email avatar role phone studentCode teacher.designation';
+// Students only get public profile fields of staff; email and phone stay private to staff and admins.
+const STAFF_FIELDS = 'name email avatar role phone studentCode teacher.designation';
+const STUDENT_FIELDS = 'name avatar role teacher.designation';
+const fieldsFor = (actor) => (actor.role === 'student' ? STUDENT_FIELDS : STAFF_FIELDS);
 
 const keyFor = (a, b) => [String(a), String(b)].sort().join(':');
 const idOf = (doc) => String(doc._id || doc);
@@ -47,7 +50,7 @@ export async function contacts(actor, search) {
   const filter = { _id: { $ne: actor._id }, status: { $ne: 'inactive' } };
   if (allowed) filter._id = { $in: allowed.filter((id) => String(id) !== String(actor._id)) };
   if (search) filter.name = new RegExp(escapeRegex(search), 'i');
-  return User.find(filter).select(USER_FIELDS).sort({ name: 1 }).limit(30);
+  return User.find(filter).select(fieldsFor(actor)).sort({ name: 1 }).limit(30);
 }
 
 function shape(conversation, actor) {
@@ -66,7 +69,7 @@ function shape(conversation, actor) {
 }
 
 export async function listConversations(actor, { tab = 'all', search }) {
-  const conversations = await Conversation.find({ participants: actor._id }).sort({ lastMessageAt: -1 }).limit(200).populate('participants', USER_FIELDS);
+  const conversations = await Conversation.find({ participants: actor._id }).sort({ lastMessageAt: -1 }).limit(200).populate('participants', fieldsFor(actor));
   let rows = conversations.map((c) => shape(c, actor));
 
   const counts = {
@@ -157,7 +160,7 @@ export async function messagesSummary(actor) {
 }
 
 async function loadConversation(id, actor) {
-  const conversation = await Conversation.findById(id).populate('participants', USER_FIELDS);
+  const conversation = await Conversation.findById(id).populate('participants', fieldsFor(actor));
   if (!conversation || !conversation.participants.some((p) => idOf(p) === idOf(actor))) throw ApiError.notFound('Conversation not found');
   return conversation;
 }
@@ -178,7 +181,7 @@ export async function startConversation(actor, userId) {
   if (!conversation) {
     conversation = await Conversation.create({ participants: [actor._id, userId], participantKey: keyFor(actor._id, userId), lastMessageAt: new Date(0) });
   }
-  await conversation.populate('participants', USER_FIELDS);
+  await conversation.populate('participants', fieldsFor(actor));
   return shape(conversation, actor);
 }
 
@@ -199,6 +202,12 @@ export async function sendMessage(actor, conversationId, { text, attachments = [
   const payload = { conversationId: idOf(conversation), message: populated.toJSON() };
   emitToUser(idOf(other), 'message:new', payload);
   emitToUser(idOf(actor), 'message:new', payload);
+
+  // One rolling notification per conversation, so a busy chat does not flood the bell.
+  const preview = (text?.trim() || attachments[0]?.name || 'Sent an attachment').slice(0, 120);
+  await Notification.deleteMany({ user: other._id, section: 'messages', ref: idOf(conversation), read: false });
+  const note = await Notification.create({ user: other._id, title: `New message from ${actor.name}`, body: preview, type: 'message', link: other.role === 'student' ? '/app/messages' : '/messages', section: 'messages', ref: idOf(conversation) });
+  emitToUser(idOf(other), 'notification:new', note.toJSON());
   return populated;
 }
 
@@ -211,12 +220,19 @@ export async function toggleFlag(id, actor, field) {
   return shape(conversation, actor);
 }
 
+// A teacher only sees the student's enrollments in their own courses.
+async function staffEnrollmentScope(actor) {
+  if (actor.role !== 'teacher') return {};
+  const courseIds = await Course.distinct('_id', { $or: [{ instructor: actor._id }, { teachers: actor._id }] });
+  return { course: { $in: courseIds } };
+}
+
 export async function participantDetails(id, actor) {
   const conversation = await loadConversation(id, actor);
   const other = conversation.participants.find((p) => idOf(p) !== idOf(actor));
   if (other.role !== 'student') return { user: other.toJSON(), enrollments: [], completedClasses: 0, supportTickets: 0 };
   const [enrollments, completedClasses, supportTickets] = await Promise.all([
-    Enrollment.find({ student: other._id }).populate('course', 'title thumbnail category').populate('batch', 'name startDate'),
+    Enrollment.find({ student: other._id, ...(await staffEnrollmentScope(actor)) }).populate('course', 'title thumbnail category').populate('batch', 'name startDate'),
     Attendance.countDocuments({ student: other._id, status: { $in: ['present', 'late'] } }),
     Ticket.countDocuments({ student: other._id }),
   ]);

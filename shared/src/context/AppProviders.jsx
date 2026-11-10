@@ -49,9 +49,12 @@ function AuthProvider({ client, portal, children }) {
     [client, portal],
   );
 
-  const register = useCallback(
-    async (payload) => {
-      const { data } = await client.post('/auth/register', payload);
+  // Sign up only creates the account and emails a code; the student is signed in once the code is verified.
+  const register = useCallback(async (payload) => (await client.post('/auth/register', payload)).data, [client]);
+
+  const verifyEmail = useCallback(
+    async (email, code) => {
+      const { data } = await client.post('/auth/verify-email', { email, code });
       client.setToken(data.token);
       setUser(data.user);
       return data.user;
@@ -70,7 +73,7 @@ function AuthProvider({ client, portal, children }) {
     return data;
   }, [client]);
 
-  const value = useMemo(() => ({ user, setUser, loading, login, register, logout, refreshUser, portal }), [user, loading, login, register, logout, refreshUser, portal]);
+  const value = useMemo(() => ({ user, setUser, loading, login, register, verifyEmail, logout, refreshUser, portal }), [user, loading, login, register, verifyEmail, logout, refreshUser, portal]);
 
   if (loading) return <PageLoader />;
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

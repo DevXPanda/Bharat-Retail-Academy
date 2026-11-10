@@ -90,7 +90,7 @@ export function ToastProvider({ children }) {
     <ToastContext.Provider value={api}>
       {children}
       {createPortal(
-        <div className="pointer-events-none fixed bottom-5 right-5 z-[80] flex w-80 flex-col gap-2">
+        <div className="pointer-events-none fixed right-4 top-4 z-[80] flex w-[calc(100vw-2rem)] max-w-80 flex-col gap-2 sm:right-5 sm:top-5">
           {toasts.map((t) => {
             const { icon: Icon, cls } = TOAST_STYLES[t.type];
             return (

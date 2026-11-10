@@ -1,11 +1,12 @@
 import { Router } from 'express';
+import { orderLimiter } from '../../middleware/security.js';
 import { z } from 'zod';
 import { authenticate, authorize } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { created, noContent, ok } from '../../utils/response.js';
 import { collectPages, listQuerySchema } from '../../utils/query.js';
-import { sendCsv } from '../../utils/csv.js';
+import { sendExcel } from '../../utils/excel.js';
 import { formatDateTime } from '../../utils/format.js';
 import * as service from './payments.service.js';
 
@@ -32,7 +33,7 @@ export const webhookHandler = asyncHandler(async (req, res) => {
 const router = Router();
 router.use(authenticate);
 
-router.post('/orders', authorize('student'), validate({ body: z.object({ courseId: objectId }) }), asyncHandler(async (req, res) => created(res, await service.createOrder(req.user, req.body.courseId))));
+router.post('/orders', authorize('student'), orderLimiter, validate({ body: z.object({ courseId: objectId }) }), asyncHandler(async (req, res) => created(res, await service.createOrder(req.user, req.body.courseId))));
 router.post('/verify', authorize('student'), validate({ body: verifyBody }), asyncHandler(async (req, res) => ok(res, await service.verifyPayment(req.user, req.body))));
 router.post(
   '/failed',
@@ -67,21 +68,23 @@ router.get(
   validate({ query: listQuery }),
   asyncHandler(async (req, res) => {
     const items = await collectPages((page, limit) => service.listPayments(req.user, { ...req.query, page, limit }));
-    sendCsv(
-      res,
-      'payments.csv',
-      [
+    await sendExcel(res, {
+      filename: 'payments.xlsx',
+      title: 'Payments report',
+      rows: items,
+      columns: [
         { label: 'Student', value: (p) => p.student?.name },
         { label: 'Email', value: (p) => p.student?.email },
         { label: 'Course', value: (p) => p.course?.title },
-        { label: 'Amount', value: (p) => p.amount },
+        { label: 'Amount', value: (p) => p.amount, format: 'currency', total: true },
+        { label: 'GST', value: (p) => p.gstAmount ?? 0, format: 'currency', total: true },
+        { label: 'Invoice No', value: (p) => p.invoiceNumber },
         { label: 'Method', value: (p) => p.method },
         { label: 'Transaction ID', value: (p) => p.transactionId || p.razorpayOrderId },
         { label: 'Status', value: (p) => p.status },
         { label: 'Date', value: (p) => formatDateTime(p.createdAt) },
       ],
-      items,
-    );
+    });
   }),
 );
 

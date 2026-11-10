@@ -1,3 +1,5 @@
+import { signPayload } from './fileLinks.js';
+
 let io = null;
 const online = new Map();
 
@@ -5,9 +7,9 @@ export const setIo = (instance) => {
   io = instance;
 };
 
-export const emitToUser = (userId, event, payload) => io?.to(`user:${userId}`).emit(event, payload);
+export const emitToUser = (userId, event, payload) => io?.to(`user:${userId}`).emit(event, signPayload(payload));
 
-export const emitToRoom = (room, event, payload) => io?.to(room).emit(event, payload);
+export const emitToRoom = (room, event, payload) => io?.to(room).emit(event, signPayload(payload));
 
 export const markOnline = (userId) => online.set(String(userId), (online.get(String(userId)) || 0) + 1);
 

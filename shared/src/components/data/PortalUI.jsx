@@ -5,6 +5,7 @@ import { Checkbox } from '../ui/Form.jsx';
 import { Badge, EmptyState, ErrorState, Spinner } from '../ui/Display.jsx';
 import { Trend } from './StatCard.jsx';
 import { cx } from '../../lib/format.js';
+import { useRowHighlight } from '../../hooks/notifications.js';
 import { ChatCenter } from '../chat/ChatCenter.jsx';
 import { PortalDrawer } from '../layout/PortalDrawer.jsx';
 
@@ -59,6 +60,7 @@ export function PortalViewAll({ to, onClick, label = 'View all' }) {
 }
 
 export function PortalDataTable({ columns, rows = [], rowKey = (row) => row.id, selectable, selected = [], onSelectedChange, loading, error, onRetry, empty, onRowClick, className, minWidth = 760, label = 'Data table, scroll horizontally for more columns' }) {
+  const { isUnread, markRead } = useRowHighlight();
   const allSelected = rows.length > 0 && rows.every((row) => selected.includes(rowKey(row)));
   return <div className={cx('portal-table-wrap', className)}>
     <div className="portal-table-scroll" tabIndex={0} role="region" aria-label={label}>
@@ -70,7 +72,8 @@ export function PortalDataTable({ columns, rows = [], rowKey = (row) => row.id, 
         </tr></thead>
         <tbody>{!loading && !error && rows.map((row, index) => {
           const id = rowKey(row);
-          return <tr key={id} className={cx(selected.includes(id) && 'is-selected', onRowClick && 'is-clickable')} onClick={onRowClick ? (event) => { if (!event.target.closest('a, button, input, select, textarea')) onRowClick(row); } : undefined} tabIndex={onRowClick ? 0 : undefined} onKeyDown={onRowClick ? (event) => { if (event.target === event.currentTarget && ['Enter', ' '].includes(event.key)) { event.preventDefault(); onRowClick(row); } } : undefined}>
+          const fresh = isUnread(id);
+          return <tr key={id} className={cx(selected.includes(id) && 'is-selected', onRowClick && 'is-clickable', fresh && 'is-new')} onClick={onRowClick || fresh ? (event) => { if (fresh) markRead(id); if (onRowClick && !event.target.closest('a, button, input, select, textarea')) onRowClick(row); } : undefined} tabIndex={onRowClick ? 0 : undefined} onKeyDown={onRowClick ? (event) => { if (event.target === event.currentTarget && ['Enter', ' '].includes(event.key)) { event.preventDefault(); onRowClick(row); } } : undefined}>
             {selectable && <td className="portal-table-check" onClick={(event) => event.stopPropagation()}><Checkbox checked={selected.includes(id)} onChange={(checked) => onSelectedChange?.(checked ? [...selected, id] : selected.filter((item) => item !== id))} aria-label="Select row" /></td>}
             {columns.map((column) => <td key={column.key} className={cx(column.align === 'center' && 'text-center', column.align === 'right' && 'text-right', column.className)}>{column.render ? column.render(row, index) : row[column.key]}</td>)}
           </tr>;

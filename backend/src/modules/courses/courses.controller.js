@@ -23,3 +23,5 @@ export const remove = asyncHandler(async (req, res) => {
 });
 
 export const review = asyncHandler(async (req, res) => ok(res, await service.addReview(req.params.id, req.user, req.body)));
+
+export const students = asyncHandler(async (req, res) => ok(res, await service.courseStudents(req.params.id, req.user)));

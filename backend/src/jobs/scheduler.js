@@ -3,6 +3,7 @@ import LiveClass from '../models/LiveClass.js';
 import { syncBatchStatuses } from '../modules/batches/batches.service.js';
 import { sendDueAnnouncements } from '../modules/messages/messages.service.js';
 import { refreshStudentStatus } from '../modules/enrollments/enrollment.service.js';
+import { sendClassReminders } from './classReminders.js';
 
 async function expireEnrollments() {
   const expired = await Enrollment.find({ status: 'active', accessEnd: { $lt: new Date() } }).select('student');
@@ -16,9 +17,21 @@ async function closeAbandonedClasses() {
   await LiveClass.updateMany({ status: 'upcoming', startsAt: { $lt: cutoff }, startedAt: { $exists: false } }, { status: 'cancelled' });
 }
 
-const tasks = [syncBatchStatuses, sendDueAnnouncements, expireEnrollments, closeAbandonedClasses];
+const tasks = [syncBatchStatuses, sendDueAnnouncements, expireEnrollments, closeAbandonedClasses, sendClassReminders];
+
+let running = false;
 
 async function runAll() {
+  if (running) return;
+  running = true;
+  try {
+    await runTasks();
+  } finally {
+    running = false;
+  }
+}
+
+async function runTasks() {
   for (const task of tasks) {
     try {
       await task();
@@ -28,7 +41,7 @@ async function runAll() {
   }
 }
 
-export function startScheduler(intervalMs = 5 * 60 * 1000) {
+export function startScheduler(intervalMs = 2 * 60 * 1000) {
   runAll();
   const timer = setInterval(runAll, intervalMs);
   timer.unref();

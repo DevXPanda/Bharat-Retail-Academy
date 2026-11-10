@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Loader2, Mail, MapPin, Phone } from 'lucide-react';
 import { BRAND, BrandMark, BrandName, useAction, useClient, useGet } from '@ecomedu/ui';
+import { useAuthModal } from './AuthModal.jsx';
 import { ADDRESS as DEFAULT_ADDRESS, FOOTER_COURSE_LINKS, SOCIALS as DEFAULT_SOCIALS, SUPPORT_EMAIL as DEFAULT_EMAIL, SUPPORT_HOURS as DEFAULT_HOURS, SUPPORT_PHONE as DEFAULT_PHONE } from '../config.js';
 
 const COLUMNS = [
   ['Courses', [...FOOTER_COURSE_LINKS.map((category) => [category, `/courses?category=${encodeURIComponent(category)}`]), ['All courses', '/courses']]],
   ['Learning', [['Live classes', '/live-classes'], ['Teachers', '/teachers'], ['Verify certificate', '/verify'], ['Blog', '/blog']]],
-  [BRAND.short, [['About us', '/about'], ['Contact us', '/contact'], ['Log in', '/login'], ['Create account', '/signup']]],
+  [BRAND.short, [['About us', '/about'], ['Contact us', '/contact'], ['Log in', '#login'], ['Create account', '#signup']]],
 ];
 const LEGAL = [['Privacy policy', '/privacy'], ['Terms of use', '/terms'], ['Refund policy', '/refund-policy']];
 
@@ -43,6 +44,7 @@ function Newsletter() {
 }
 
 export default function Footer() {
+  const { open: openAuth } = useAuthModal();
   // Contact details and social links come from Admin > Platform Settings; config.js is only the fallback.
   const site = useGet('/public/settings').data;
   const SUPPORT_EMAIL = site?.supportEmail || DEFAULT_EMAIL;
@@ -54,7 +56,7 @@ export default function Footer() {
     <footer className="public-footer">
       <div className="public-container">
         <div className="footer-top">
-          <Link to="/" aria-label={`${BRAND.name} home`} className="footer-brand"><BrandMark size={46} /><BrandName caption={BRAND.tagline} dark /></Link>
+          <Link to="/" aria-label={`${BRAND.name} home`} className="footer-brand"><BrandMark size={46} /><BrandName dark /></Link>
           <Newsletter />
         </div>
 
@@ -62,7 +64,7 @@ export default function Footer() {
           {COLUMNS.map(([title, items]) => (
             <nav key={title} aria-label={`Footer ${title}`}>
               <h2>{title}</h2>
-              <ul>{items.map(([label, to]) => <li key={to}><Link to={to}>{label}</Link></li>)}</ul>
+              <ul>{items.map(([label, to]) => <li key={to}>{to.startsWith('#') ? <button type="button" onClick={() => openAuth(to.slice(1))}>{label}</button> : <Link to={to}>{label}</Link>}</li>)}</ul>
             </nav>
           ))}
           <div className="footer-contact">

@@ -1,5 +1,6 @@
+import PageFrame from '../components/PageFrame.jsx';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, Globe, Instagram, Linkedin, MapPin, Youtube } from 'lucide-react';
+import { Globe, Instagram, Linkedin, MapPin, Youtube } from 'lucide-react';
 import { Avatar, Badge, EmptyState, Spinner, useGet } from '@ecomedu/ui';
 import CourseCard, { RatingStars } from '../components/CourseCard.jsx';
 
@@ -14,10 +15,9 @@ export default function TeacherDetail() {
 
   const info = t.teacher || {};
   return (
-    <div className="mx-auto max-w-[1280px] px-4 py-10 sm:px-6">
-      <Link to="/teachers" className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-brand-600"><ArrowLeft className="h-4 w-4" />All teachers</Link>
+    <PageFrame>
 
-      <section className="mt-5 flex flex-wrap items-center gap-8 rounded-2xl border border-slate-200 bg-white p-7 shadow-card">
+      <section className="teacher-profile-header">
         <Avatar name={t.name} src={t.avatar} size={120} />
         <div className="min-w-0 flex-1">
           <h1 className="text-3xl font-extrabold tracking-tight text-ink">{t.name}</h1>
@@ -34,23 +34,23 @@ export default function TeacherDetail() {
         </div>
       </section>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
+      <div className="teacher-profile-content">
         <div>
           {(t.about || info.bio) && (<><h2 className="text-xl font-extrabold text-ink">About</h2><p className="mt-3 leading-relaxed text-slate-600">{t.about || info.bio}</p></>)}
           <h2 className="mt-9 text-xl font-extrabold text-ink">Courses by {t.name.split(' ')[0]}</h2>
           {t.courses.length === 0 ? <p className="mt-3 text-sm text-slate-500">No published courses yet.</p> : <div className="mt-4 grid gap-6 sm:grid-cols-2">{t.courses.map((c) => <CourseCard key={c.id} course={c} />)}</div>}
         </div>
         <aside className="space-y-6">
-          {info.skills?.length > 0 && <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card"><h3 className="font-extrabold text-ink">Skills</h3><div className="mt-3 flex flex-wrap gap-2">{info.skills.map((s) => <Badge key={s} tone="blue">{s}</Badge>)}</div></div>}
-          {info.languages?.length > 0 && <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card"><h3 className="font-extrabold text-ink">Teaches in</h3><p className="mt-2 text-sm text-slate-600">{info.languages.join(', ')}</p></div>}
+          {info.skills?.length > 0 && <div className="public-panel p-5"><h3 className="font-extrabold text-ink">Skills</h3><div className="mt-3 flex flex-wrap gap-2">{info.skills.map((s) => <Badge key={s} tone="blue">{s}</Badge>)}</div></div>}
+          {info.languages?.length > 0 && <div className="public-panel p-5"><h3 className="font-extrabold text-ink">Teaches in</h3><p className="mt-2 text-sm text-slate-600">{info.languages.join(', ')}</p></div>}
           {(info.education?.length > 0 || info.certifications?.length > 0) && (
-            <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-card">
+            <div className="public-panel p-5">
               <h3 className="font-extrabold text-ink">Education &amp; certifications</h3>
               <ul className="mt-3 space-y-3 text-sm">{[...(info.education || []).map((e) => [e.title, [e.institute, e.year]]), ...(info.certifications || []).map((e) => [e.title, [e.issuer, e.year]])].map(([title, meta]) => <li key={title}><p className="font-semibold text-ink">{title}</p><p className="text-xs text-slate-500">{meta.filter(Boolean).join(' | ')}</p></li>)}</ul>
             </div>
           )}
         </aside>
       </div>
-    </div>
+    </PageFrame>
   );
 }

@@ -62,7 +62,7 @@ export async function createRecording(actor, payload) {
 
 async function notifyStudents(recording) {
   const students = await Enrollment.distinct('student', { course: recording.course, status: { $in: ['active', 'completed'] } });
-  await notifyUsers(students, { title: 'New class recording', body: recording.title, type: 'recording', link: '/app/recordings' });
+  await notifyUsers(students, { title: 'New class recording', body: recording.title, type: 'recording', link: '/app/recordings', section: 'recordings', ref: recording.id });
 }
 
 async function loadOwned(id, actor) {

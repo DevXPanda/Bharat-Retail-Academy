@@ -46,7 +46,7 @@ export default function Leads() {
   const setStatus = useAction((lead, status) => client.patch(`/leads/${lead.id}`, { status }), { success: 'Lead updated', invalidate: ['/leads'] });
   const remove = useAction((lead) => client.delete(`/leads/${lead.id}`), { success: 'Lead deleted', invalidate: ['/leads'], onSuccess: () => setDeleting(null) });
   const bulk = useAction((action) => client.post('/leads/bulk', { ids: selected, action }), { success: (r) => `${r.data.affected} lead(s) updated`, invalidate: ['/leads'], onSuccess: () => setSelected([]) });
-  const exportCsv = useAction(() => client.download('/leads/export', 'leads.csv', { status: list.filters.status === 'all' ? undefined : list.filters.status, source: list.filters.source === 'all' ? undefined : list.filters.source, search: list.filters.search || undefined, from: list.filters.from || undefined, to: list.filters.to || undefined }));
+  const exportCsv = useAction(() => client.download('/leads/export', 'leads.xlsx', { status: list.filters.status === 'all' ? undefined : list.filters.status, source: list.filters.source === 'all' ? undefined : list.filters.source, search: list.filters.search || undefined, from: list.filters.from || undefined, to: list.filters.to || undefined }));
 
   const tabs = [
     { key: 'all', label: 'All Leads', count: summary?.total.value },

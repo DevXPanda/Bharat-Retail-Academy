@@ -1,5 +1,7 @@
+import mongoose from 'mongoose';
 import Course from '../../models/Course.js';
 import Enrollment from '../../models/Enrollment.js';
+import Payment from '../../models/Payment.js';
 import { Review } from '../../models/Engagement.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { mergeFilters, paginate, searchFilter } from '../../utils/query.js';
@@ -109,4 +111,46 @@ export async function addReview(courseId, student, { rating, comment }) {
   ]);
   await Course.updateOne({ _id: courseId }, { rating: Math.round((agg?.avg || 0) * 10) / 10, ratingCount: agg?.count || 0 });
   return { rating: agg?.avg || 0, count: agg?.count || 0 };
+}
+
+// Every student enrolled in a course, with their batch, progress and access window. Admin also gets what each paid;
+// a teacher can only open this for a course they teach.
+export async function courseStudents(id, actor) {
+  const course = await getCourse(id, actor);
+  const enrollments = await Enrollment.find({ course: course.id })
+    .sort({ createdAt: -1 })
+    .populate('student', 'name email phone avatar studentCode status')
+    .populate('batch', 'name')
+    .populate('payment', 'amount invoiceNumber status');
+
+  const students = enrollments
+    .filter((e) => e.student)
+    .map((e) => ({
+      id: e.id,
+      student: e.student.toJSON(),
+      batch: e.batch ? { id: e.batch.id, name: e.batch.name } : null,
+      status: e.status,
+      progress: e.progress,
+      completedLessons: e.completedLessons.length,
+      source: e.source,
+      enrolledAt: e.createdAt,
+      accessStart: e.accessStart,
+      accessEnd: e.accessEnd,
+      completedAt: e.completedAt,
+      ...(actor.role === 'admin' ? { amountPaid: e.payment && ['successful', 'refunded'].includes(e.payment.status) ? e.payment.amount : 0, invoiceNumber: e.payment?.invoiceNumber } : {}),
+    }));
+
+  const count = (status) => students.filter((s) => s.status === status).length;
+  const summary = {
+    enrolled: students.length,
+    active: count('active'),
+    completed: count('completed'),
+    inactive: count('inactive'),
+    averageProgress: students.length ? Math.round(students.reduce((sum, s) => sum + (s.progress || 0), 0) / students.length) : 0,
+  };
+  if (actor.role === 'admin') {
+    const [paid] = await Payment.aggregate([{ $match: { course: new mongoose.Types.ObjectId(course.id), status: 'successful' } }, { $group: { _id: null, total: { $sum: '$amount' } } }]);
+    summary.revenue = paid?.total || 0;
+  }
+  return { summary, students };
 }

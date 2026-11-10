@@ -50,18 +50,18 @@ function SeriesTab({ type, year }) {
   if (type === 'students') {
     return (
       <div className="grid gap-6 p-5 lg:grid-cols-[2fr_1fr]">
-        <div><h4 className="mb-3 text-sm font-bold text-ink">New students per month</h4><BarsChart data={data.monthly} xKey="month" series={[{ key: 'value', label: 'New students', color: '#2f6df3' }]} /></div>
-        <div><h4 className="mb-3 text-sm font-bold text-ink">Student status</h4><DonutWithLegend data={data.distribution.map((d) => ({ ...d, name: d.name[0].toUpperCase() + d.name.slice(1), color: { active: '#22c55e', pending: '#f59e0b', inactive: '#ef4444' }[d.name] }))} centerValue={data.distribution.reduce((s, d) => s + d.value, 0)} centerLabel="Students" size={140} /></div>
+        <div><h4 className="mb-3 text-sm font-bold text-ink">New students per month</h4><BarsChart data={data.monthly} xKey="month" series={[{ key: 'value', label: 'New students', color: '#2563eb' }]} /></div>
+        <div><h4 className="mb-3 text-sm font-bold text-ink">Student status</h4><DonutWithLegend data={data.distribution.map((d) => ({ ...d, name: d.name[0].toUpperCase() + d.name.slice(1), color: { active: '#2d725e', pending: '#f59e0b', inactive: '#ef4444' }[d.name] }))} centerValue={data.distribution.reduce((s, d) => s + d.value, 0)} centerLabel="Students" size={140} /></div>
       </div>
     );
   }
   if (type === 'teachers') {
-    return <div className="p-5"><h4 className="mb-3 text-sm font-bold text-ink">Completed classes & earnings per teacher</h4><BarsChart data={data.rows} xKey="name" series={[{ key: 'classes', label: 'Classes', color: '#8b5cf6' }]} /></div>;
+    return <div className="p-5"><h4 className="mb-3 text-sm font-bold text-ink">Completed classes & earnings per teacher</h4><BarsChart data={data.rows} xKey="name" series={[{ key: 'classes', label: 'Classes', color: '#44597a' }]} /></div>;
   }
   if (type === 'courses') {
     return (
       <div className="grid gap-6 p-5 lg:grid-cols-2">
-        <div><h4 className="mb-3 text-sm font-bold text-ink">Enrollments vs completions</h4><BarsChart data={data.rows} xKey="name" layout="vertical" height={360} series={[{ key: 'enrolled', label: 'Enrolled', color: '#2f6df3' }, { key: 'completed', label: 'Completed', color: '#22c55e' }]} /></div>
+        <div><h4 className="mb-3 text-sm font-bold text-ink">Enrollments vs completions</h4><BarsChart data={data.rows} xKey="name" layout="vertical" height={360} series={[{ key: 'enrolled', label: 'Enrolled', color: '#2563eb' }, { key: 'completed', label: 'Completed', color: '#2d725e' }]} /></div>
         <div><h4 className="mb-3 text-sm font-bold text-ink">Revenue by course</h4><BarsChart data={data.rows} xKey="name" layout="vertical" height={360} currency series={[{ key: 'revenue', label: 'Revenue', color: '#f59e0b' }]} /></div>
       </div>
     );
@@ -69,12 +69,12 @@ function SeriesTab({ type, year }) {
   if (type === 'payments') {
     return (
       <div className="grid gap-6 p-5 lg:grid-cols-2">
-        <div><h4 className="mb-3 text-sm font-bold text-ink">Transactions by status</h4><DonutWithLegend data={data.status.map((d) => ({ ...d, name: d.name[0].toUpperCase() + d.name.slice(1), color: { successful: '#22c55e', pending: '#f59e0b', failed: '#ef4444', refunded: '#8b5cf6' }[d.name] }))} centerValue={data.status.reduce((s, d) => s + d.value, 0)} centerLabel="Transactions" size={150} /></div>
+        <div><h4 className="mb-3 text-sm font-bold text-ink">Transactions by status</h4><DonutWithLegend data={data.status.map((d) => ({ ...d, name: d.name[0].toUpperCase() + d.name.slice(1), color: { successful: '#2d725e', pending: '#f59e0b', failed: '#ef4444', refunded: '#44597a' }[d.name] }))} centerValue={data.status.reduce((s, d) => s + d.value, 0)} centerLabel="Transactions" size={150} /></div>
         <div><h4 className="mb-3 text-sm font-bold text-ink">Revenue by payment method</h4><DonutWithLegend data={data.methods} format={formatCurrency} centerValue={formatCurrency(data.methods.reduce((s, d) => s + d.value, 0))} size={150} /></div>
       </div>
     );
   }
-  return <div className="p-5"><h4 className="mb-3 text-sm font-bold text-ink">Revenue, payouts and net revenue</h4><TrendChart data={data.monthly} xKey="month" currency height={320} series={[{ key: 'revenue', label: 'Revenue', color: '#2f6df3' }, { key: 'payouts', label: 'Payouts', color: '#f59e0b' }, { key: 'net', label: 'Net', color: '#22c55e' }]} /></div>;
+  return <div className="p-5"><h4 className="mb-3 text-sm font-bold text-ink">Revenue, payouts and net revenue</h4><TrendChart data={data.monthly} xKey="month" currency height={320} series={[{ key: 'revenue', label: 'Revenue', color: '#2563eb' }, { key: 'payouts', label: 'Payouts', color: '#f59e0b' }, { key: 'net', label: 'Net', color: '#2d725e' }]} /></div>;
 }
 
 export default function Reports() {
@@ -89,7 +89,7 @@ export default function Reports() {
   const topCourses = useGet('/reports/top-courses').data || [];
   const topTeachers = useGet('/reports/top-teachers').data || [];
 
-  const download = useAction((type) => client.download('/reports/export', `${type}-report-${type === 'monthly' ? year : 'yearly'}.csv`, { type, year, from: thisYear - 5, to: thisYear }), { success: 'Report download started' });
+  const download = useAction((type) => client.download('/reports/export', `${type}-report-${type === 'monthly' ? year : 'yearly'}.xlsx`, { type, year, from: thisYear - 5, to: thisYear }), { success: 'Report download started' });
 
   const cards = overview?.cards;
   const years = Array.from({ length: 6 }, (_, i) => thisYear - i);
@@ -153,8 +153,8 @@ export default function Reports() {
             {tab === 'overview' && trendData.length === 0 && <EmptyState icon={TrendingUp} title="No report data yet" description={`Revenue and enrollment activity for ${year} will appear here.`} />}
             {tab === 'overview' && trendData.length > 0 && (
               <div className="grid gap-6 p-5 lg:grid-cols-2">
-                <div><h4 className="mb-3 text-sm font-bold text-ink">Revenue trend - {year}</h4><TrendChart data={trendData} currency series={[{ key: 'payments', label: 'Payments', color: '#2f6df3' }, { key: 'net', label: 'Net revenue', color: '#22c55e' }]} /></div>
-                <div><h4 className="mb-3 text-sm font-bold text-ink">New students - {year}</h4><BarsChart data={(monthly?.rows || []).map((r) => ({ label: r.month.slice(0, 3), students: r.newStudents }))} series={[{ key: 'students', label: 'New students', color: '#8b5cf6' }]} /></div>
+                <div><h4 className="mb-3 text-sm font-bold text-ink">Revenue trend - {year}</h4><TrendChart data={trendData} currency series={[{ key: 'payments', label: 'Payments', color: '#2563eb' }, { key: 'net', label: 'Net revenue', color: '#2d725e' }]} /></div>
+                <div><h4 className="mb-3 text-sm font-bold text-ink">New students - {year}</h4><BarsChart data={(monthly?.rows || []).map((r) => ({ label: r.month.slice(0, 3), students: r.newStudents }))} series={[{ key: 'students', label: 'New students', color: '#44597a' }]} /></div>
               </div>
             )}
 

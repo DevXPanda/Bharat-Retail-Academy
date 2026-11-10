@@ -4,6 +4,7 @@ import {
   Drawer, Button, CATEGORY_OPTIONS, Checkbox, ConfirmDialog, CourseMark, DataTable, ExpertiseTag, Field, FileUpload, FilterBar, FilterSelect, IconButton, Input, Modal, PageHeader, RowMenu,
   Select, SidePanel, StatCard, StatGrid, StatusBadge, TableCard, TableFooter, Tabs, Textarea, Badge, formatCurrency, indexColumn, useAction, useClient, useGet, useListState,
 } from '../components/ui.jsx';
+import { CourseDetails } from '../components/CourseDetails.jsx';
 
 const LEVELS = ['Beginner', 'Intermediate', 'Advanced', 'Beginner to Advanced', 'Beginner to Intermediate', 'All Levels'];
 const BADGES = ['', 'Bestseller', 'Popular', 'New', 'Trending', 'Most Enrolled'];
@@ -188,6 +189,7 @@ export default function Courses() {
   const [editing, setEditing] = useState(null);
   const [editorOpen, setEditorOpen] = useState(false);
   const [deleting, setDeleting] = useState(null);
+  const [viewing, setViewing] = useState(null);
 
   const summary = useGet('/courses/summary').data;
   const teachers = useGet('/teachers', { limit: 100, status: 'active' }).data || [];
@@ -221,7 +223,7 @@ export default function Courses() {
       header: 'Action',
       render: (c) => (
         <div className="flex items-center gap-1.5">
-          <IconButton icon={Eye} label={c.status === 'published' ? 'Unpublish' : 'Publish'} onClick={() => toggle.run(c)} />
+          <IconButton icon={Eye} label="View details and students" onClick={() => setViewing(c)} />
           <IconButton icon={Pencil} label="Edit" onClick={() => { setEditing(c); setEditorOpen(true); }} />
           <RowMenu items={[{ label: c.status === 'published' ? 'Move to draft' : 'Publish', icon: CheckCircle2, onClick: () => toggle.run(c) }, { label: 'Delete', icon: Trash2, danger: true, onClick: () => setDeleting(c) }]} />
         </div>
@@ -249,6 +251,8 @@ export default function Courses() {
           <TableFooter meta={meta} noun="courses" onPage={list.setPage} />
         </TableCard></div>
 <Drawer open={editorOpen} onClose={() => { setEditorOpen(false); setEditing(null); }} title={editing ? 'Edit course' : 'Create course'}><CourseForm editing={editing} teachers={teachers} onDone={() => { setEditorOpen(false); setEditing(null); }} /></Drawer>
+
+      <CourseDetails course={viewing} onClose={() => setViewing(null)} onEdit={(c) => { setViewing(null); setEditing(c); setEditorOpen(true); }} onToggle={(c) => toggle.run(c)} />
 
       <ConfirmDialog open={Boolean(deleting)} onClose={() => setDeleting(null)} loading={remove.loading} onConfirm={() => remove.run(deleting)} title="Delete course" confirmLabel="Delete" message={`Delete "${deleting?.title}"? Courses with enrolled students cannot be deleted - move them to draft instead.`} />
     </>

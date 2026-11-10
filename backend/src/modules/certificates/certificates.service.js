@@ -8,6 +8,7 @@ import { formatDate } from '../../utils/format.js';
 import User from '../../models/User.js';
 import Course from '../../models/Course.js';
 import { notifyUsers } from '../../services/notify.js';
+import { brandInfo } from '../../services/brand.js';
 
 const POPULATE = [
   { path: 'student', select: 'name email avatar' },
@@ -48,7 +49,7 @@ export async function generateManually(actor, { studentId, courseId }) {
   const existing = await Certificate.findOne({ student: studentId, course: courseId });
   if (existing) throw ApiError.conflict('A certificate already exists for this student and course');
   const cert = await issueCertificate({ studentId, courseId, batchId: enrollment.batch, status: 'verified', issuedBy: actor._id });
-  await notifyUsers([studentId], { title: 'Certificate ready', body: 'Your course completion certificate is available to download.', type: 'certificate', link: '/app/certificates' });
+  await notifyUsers([studentId], { title: 'Certificate ready', body: 'Your course completion certificate is available to download.', type: 'certificate', link: '/app/certificates', section: 'certificates', ref: cert.id });
   return cert.populate(POPULATE);
 }
 
@@ -87,7 +88,7 @@ export async function updateStatus(id, status) {
   const cert = await Certificate.findByIdAndUpdate(id, { status }, { new: true }).populate(POPULATE);
   if (!cert) throw ApiError.notFound('Certificate not found');
   if (status === 'verified') {
-    await notifyUsers([cert.student._id], { title: 'Certificate verified', body: `Your certificate for ${cert.course.title} is ready.`, type: 'certificate', link: '/app/certificates' });
+    await notifyUsers([cert.student._id], { title: 'Certificate verified', body: `Your certificate for ${cert.course.title} is ready.`, type: 'certificate', link: '/app/certificates', section: 'certificates', ref: cert.id });
   }
   return cert;
 }
@@ -121,24 +122,35 @@ export async function renderPdf(id, actor, res) {
   if (actor.role === 'student' && cert.status !== 'verified') throw ApiError.forbidden('Certificate is not verified yet');
   if (actor.role === 'student') await Certificate.updateOne({ _id: id }, { $inc: { downloads: 1 } });
 
+  const brand = await brandInfo();
   const doc = new PDFDocument({ size: 'A4', layout: 'landscape', margin: 0 });
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename="${cert.certificateId}.pdf"`);
   doc.pipe(res);
 
   const { width, height } = doc.page;
-  doc.rect(0, 0, width, height).fill('#f4f8ff');
-  doc.lineWidth(6).rect(24, 24, width - 48, height - 48).stroke('#1d63f0');
-  doc.lineWidth(1).rect(38, 38, width - 76, height - 76).stroke('#9db8f5');
+  doc.rect(0, 0, width, height).fill('#fbfcff');
+  doc.lineWidth(6).rect(24, 24, width - 48, height - 48).stroke('#0b1b3f');
+  doc.lineWidth(1.5).rect(38, 38, width - 76, height - 76).stroke('#f97316');
 
-  doc.fillColor('#1d63f0').font('Helvetica-Bold').fontSize(18).text('EcomEdu', 0, 80, { align: 'center' });
-  doc.fillColor('#0b1b3a').font('Helvetica-Bold').fontSize(38).text('Certificate of Completion', 0, 120, { align: 'center' });
-  doc.fillColor('#51607a').font('Helvetica').fontSize(14).text('This is to certify that', 0, 190, { align: 'center' });
-  doc.fillColor('#0b1b3a').font('Helvetica-Bold').fontSize(32).text(cert.student.name, 0, 220, { align: 'center' });
-  doc.fillColor('#51607a').font('Helvetica').fontSize(14).text('has successfully completed the course', 0, 275, { align: 'center' });
-  doc.fillColor('#1d63f0').font('Helvetica-Bold').fontSize(24).text(cert.course.title, 60, 305, { align: 'center', width: width - 120 });
-  doc.fillColor('#51607a').font('Helvetica').fontSize(12).text(`Completed on ${formatDate(cert.completionDate)}`, 0, 370, { align: 'center' });
-  doc.fontSize(11).text(`Certificate ID: ${cert.certificateId}`, 0, height - 110, { align: 'center' });
-  doc.fontSize(10).text('Verify this certificate at the EcomEdu website using the certificate id.', 0, height - 90, { align: 'center' });
+  // Faint logo behind the text, like a seal.
+  if (brand.logo) {
+    doc.save();
+    doc.opacity(0.07);
+    doc.image(brand.logo, width / 2 - 170, height / 2 - 150, { width: 340 });
+    doc.restore();
+    doc.image(brand.logo, width / 2 - 42, 52, { width: 84 });
+  }
+
+  doc.fillColor('#0b1b3f').font('Helvetica-Bold').fontSize(14).text(brand.name.toUpperCase(), 0, 144, { align: 'center', characterSpacing: 2 });
+  doc.fillColor('#f97316').font('Helvetica').fontSize(8.5).text(brand.tagline.toUpperCase(), 0, 163, { align: 'center', characterSpacing: 1.5 });
+  doc.fillColor('#0b1b3f').font('Helvetica-Bold').fontSize(34).text('Certificate of Completion', 0, 192, { align: 'center' });
+  doc.fillColor('#51607a').font('Helvetica').fontSize(13).text('This is to certify that', 0, 246, { align: 'center' });
+  doc.fillColor('#0b1b3f').font('Helvetica-Bold').fontSize(30).text(cert.student.name, 0, 268, { align: 'center' });
+  doc.fillColor('#51607a').font('Helvetica').fontSize(13).text('has successfully completed the course', 0, 316, { align: 'center' });
+  doc.fillColor('#f97316').font('Helvetica-Bold').fontSize(22).text(cert.course.title, 60, 340, { align: 'center', width: width - 120 });
+  doc.fillColor('#51607a').font('Helvetica').fontSize(12).text(`Completed on ${formatDate(cert.completionDate)}`, 0, 398, { align: 'center' });
+  doc.fontSize(11).text(`Certificate ID: ${cert.certificateId}`, 0, height - 112, { align: 'center' });
+  doc.fontSize(9.5).text(`Verify this certificate on the ${brand.name} website using the certificate ID.`, 0, height - 94, { align: 'center' });
   doc.end();
 }

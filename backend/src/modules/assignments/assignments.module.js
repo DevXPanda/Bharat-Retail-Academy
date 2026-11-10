@@ -89,7 +89,7 @@ router.post(
     if (!own.some((id) => String(id) === req.body.course)) throw ApiError.forbidden('You are not assigned to this course');
     const assignment = await Assignment.create({ ...req.body, teacher: req.user._id });
     const students = await Enrollment.distinct('student', { course: assignment.course, status: { $in: ['active', 'completed'] } });
-    await notifyUsers(students, { title: 'New assignment', body: assignment.title, type: 'assignment', link: '/app/courses' });
+    await notifyUsers(students, { title: 'New assignment', body: assignment.title, type: 'assignment', link: '/app/courses', section: 'courses', ref: assignment.course });
     created(res, (await shape([await assignment.populate('course', 'title')], req.user))[0]);
   }),
 );

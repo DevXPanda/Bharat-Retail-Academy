@@ -48,9 +48,9 @@ export async function updateProgress(student, courseId, { lessonId, completed })
     enrollment.status = 'completed';
     enrollment.completedAt = new Date();
     if (course.settings?.certificate) {
-      await issueCertificate({ studentId: student._id, courseId, batchId: enrollment.batch, status: 'pending' });
+      const pendingCert = await issueCertificate({ studentId: student._id, courseId, batchId: enrollment.batch, status: 'pending' });
       const admins = await User.distinct('_id', { role: 'admin' });
-      await notifyUsers(admins, { title: 'Certificate awaiting verification', body: `${student.name} completed ${course.title}.`, type: 'certificate' });
+      await notifyUsers(admins, { title: 'Certificate awaiting verification', body: `${student.name} completed ${course.title}.`, type: 'certificate', link: '/certificates', section: 'certificates', ref: pendingCert?.id });
     }
     await notifyUsers([student._id], { title: 'Course completed 🎉', body: `You completed ${course.title}. Your certificate will be issued after verification.`, type: 'certificate', link: '/app/certificates' });
   } else if (enrollment.progress < 100 && enrollment.status === 'completed') {

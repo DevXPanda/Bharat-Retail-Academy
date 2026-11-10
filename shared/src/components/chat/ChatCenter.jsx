@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Check, CheckCheck, Filter, MessageSquarePlus, MoreVertical, Paperclip, Phone, Send, Smile, Star, Video } from 'lucide-react';
 import { useAuth, useClient, useSocket } from '../../context/AppProviders.jsx';
 import { useAction, useGet, useInvalidate } from '../../hooks/index.js';
+import { useRowHighlight } from '../../hooks/notifications.js';
 import { chatTime, cx, formatTime } from '../../lib/format.js';
 import { Avatar, Badge, EmptyState, Spinner } from '../ui/Display.jsx';
 import { SearchInput } from '../ui/Form.jsx';
@@ -14,10 +15,10 @@ const EMOJIS = ['😀', '😊', '👍', '🙏', '🎉', '🔥', '❤️', '😂'
 
 const roleTone = { student: 'blue', teacher: 'purple', admin: 'orange' };
 
-function ConversationItem({ conversation, active, onClick }) {
+function ConversationItem({ conversation, active, fresh, onClick }) {
   const { other } = conversation;
   return (
-    <button type="button" onClick={onClick} className={cx('flex w-full items-start gap-3 border-b border-slate-100 px-4 py-3.5 text-left transition hover:bg-slate-50', active && 'bg-brand-50/70')}>
+    <button type="button" onClick={onClick} className={cx('flex w-full items-start gap-3 border-b border-slate-100 px-4 py-3.5 text-left transition hover:bg-slate-50', active && 'bg-brand-50/70', fresh && !active && 'is-new')}>
       <div className="relative">
         <Avatar name={other?.name} src={other?.avatar} size={44} />
         {other?.online && <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-white bg-emerald-500" />}
@@ -90,6 +91,7 @@ export function ChatCenter({ tabs, renderDetails, newChatOpen, onNewChatClose, c
   const toast = useToast();
   const invalidate = useInvalidate();
   const queryClient = useQueryClient();
+  const { isUnread, markRead } = useRowHighlight('messages');
   const [tab, setTab] = useState(tabs[0].key);
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState(null);
@@ -111,6 +113,9 @@ export function ChatCenter({ tabs, renderDetails, newChatOpen, onNewChatClose, c
 
   const thread = useGet(selectedId ? `/conversations/${selectedId}/messages` : '/conversations/none/messages', undefined, { enabled: Boolean(selectedId) && !custom });
   const messages = thread.data?.messages || [];
+  // A conversation you are looking at is read, including messages that arrive while it is open.
+  const lastIncoming = messages[messages.length - 1]?.id;
+  useEffect(() => { if (selectedId && thread.data) markRead(selectedId); }, [selectedId, lastIncoming, thread.data]); // eslint-disable-line react-hooks/exhaustive-deps
   const details = useGet(selectedId ? `/conversations/${selectedId}/participant` : '/conversations/none/participant', undefined, { enabled: Boolean(selectedId) && Boolean(renderDetails) && !custom });
 
   useEffect(() => {
@@ -123,9 +128,12 @@ export function ChatCenter({ tabs, renderDetails, newChatOpen, onNewChatClose, c
     return () => socket.off('message:new', onNew);
   }, [socket, selectedId, invalidate]);
 
-  useEffect(() => {
-    scroller.current?.scrollTo({ top: scroller.current.scrollHeight });
-  }, [messages.length, selectedId]);
+  // Keep the newest message in view: jump to the bottom when a chat opens and whenever a message is added.
+  const lastMessageId = messages[messages.length - 1]?.id;
+  useLayoutEffect(() => {
+    const el = scroller.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  }, [messages.length, lastMessageId, selectedId, thread.isLoading, Boolean(active)]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (selectedId && thread.data) queryClient.invalidateQueries({ queryKey: ['/conversations'] });
@@ -201,7 +209,7 @@ export function ChatCenter({ tabs, renderDetails, newChatOpen, onNewChatClose, c
               {list.isLoading && <div className="flex justify-center py-10"><Spinner /></div>}
               {!list.isLoading && conversations.length === 0 && <EmptyState icon={MessageSquarePlus} title="No conversations" description="Start a new message to get going." />}
               {conversations.map((c) => (
-                <ConversationItem key={c.id} conversation={c} active={c.id === selectedId} onClick={() => setSelectedId(c.id)} />
+                <ConversationItem key={c.id} conversation={c} active={c.id === selectedId} fresh={isUnread(c.id)} onClick={() => { markRead(c.id); setSelectedId(c.id); }} />
               ))}
             </div>
           </div>

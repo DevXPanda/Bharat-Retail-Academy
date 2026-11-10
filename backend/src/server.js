@@ -4,6 +4,7 @@ import { connectDb, disconnectDb } from './config/db.js';
 import app from './app.js';
 import { initSockets } from './sockets/index.js';
 import { startScheduler } from './jobs/scheduler.js';
+import { startKeepAlive } from './jobs/keepAlive.js';
 import { resumePendingVideos } from './services/media.js';
 
 async function main() {
@@ -12,6 +13,7 @@ async function main() {
   const server = http.createServer(app);
   initSockets(server);
   startScheduler();
+  startKeepAlive();
   resumePendingVideos().then((n) => n && console.log(`Resuming compression of ${n} video(s)`)).catch((err) => console.error(err.message));
 
   server.listen(env.PORT, () => console.log(`API ready on http://localhost:${env.PORT}/api/v1`));

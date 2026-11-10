@@ -23,6 +23,11 @@ const notificationSchema = new Schema(
     type: { type: String, default: 'info' },
     link: String,
     read: { type: Boolean, default: false, index: true },
+    // Sidebar section this belongs to (matches the portal route segment) and the row it points at.
+    section: { type: String, index: true },
+    ref: String,
+    // seen = the user has opened the sidebar section (clears the sidebar count); read = they opened the row itself.
+    seen: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

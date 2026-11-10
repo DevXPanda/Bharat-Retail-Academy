@@ -24,6 +24,7 @@ const liveClassSchema = new Schema(
     earning: { type: Number, default: 0 },
     payout: { type: Schema.Types.ObjectId, ref: 'Payout', index: true },
     notifyStudents: { type: Boolean, default: true },
+    reminderSentAt: Date,
     isFreeDemo: { type: Boolean, default: false, index: true },
   },
   { timestamps: true },

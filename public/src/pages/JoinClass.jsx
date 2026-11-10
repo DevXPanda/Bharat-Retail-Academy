@@ -1,9 +1,10 @@
+import PageFrame from '../components/PageFrame.jsx';
 import { Link, useParams } from 'react-router-dom';
 import { CalendarDays, Clock, Lock, LogIn, Radio, ShieldCheck, Sparkles, Video } from 'lucide-react';
 import { Avatar, Badge, EmptyState, Spinner, formatCurrency, formatDateLong, formatTime, startsInLabel, useAuth, useGet } from '@ecomedu/ui';
 
 function Shell({ children }) {
-  return <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6">{children}</div>;
+  return <PageFrame className="join-class-page">{children}</PageFrame>;
 }
 
 function Cta({ to, children, tone = 'primary' }) {
@@ -62,10 +63,10 @@ export default function JoinClass() {
 
   return (
     <Shell>
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card">
-        <div className="bg-gradient-to-br from-brand-600 via-indigo-600 to-violet-600 px-7 py-8 text-white">
+      <div className="public-panel overflow-hidden">
+        <div className="join-class-header">
           <div className="flex flex-wrap items-center gap-2">
-            {live ? <Badge tone="red" className="!bg-red-500 !text-white">● Live now</Badge> : over ? <Badge tone="slate">{cls.status === 'cancelled' ? 'Cancelled' : 'Ended'}</Badge> : <Badge tone="blue" className="!bg-white/20 !text-white">{minutes > 0 ? startsInLabel(minutes) : 'Starting soon'}</Badge>}
+            {live ? <Badge tone="red" className="!bg-red-500 !text-white">● Live now</Badge> : over ? <Badge tone="slate">{cls.status === 'cancelled' ? 'Cancelled' : 'Ended'}</Badge> : <Badge tone="blue" className="!bg-white/70 !text-brand-800">{minutes > 0 ? startsInLabel(minutes) : 'Starting soon'}</Badge>}
             {cls.isFreeDemo && <Badge tone="amber"><Sparkles className="mr-1 h-3 w-3" />Free demo</Badge>}
           </div>
           <h1 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight">{cls.title}</h1>
@@ -83,7 +84,7 @@ export default function JoinClass() {
           {cls.description && <p className="rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-600">{cls.description}</p>}
 
           {user && <p className="flex items-center gap-2 text-xs text-slate-500"><ShieldCheck className="h-4 w-4 text-brand-600" />Signed in as <span className="font-semibold text-ink">{user.name}</span></p>}
-          <div className="flex flex-wrap gap-3">{action}</div>
+          <div className="join-class-actions flex flex-wrap gap-3">{action}</div>
           {note && <p className="text-center text-xs leading-relaxed text-slate-500">{note}</p>}
         </div>
       </div>

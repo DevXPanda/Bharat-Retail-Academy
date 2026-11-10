@@ -8,17 +8,17 @@ export const TONES = {
   slate: { tile: 'bg-slate-100 text-slate-500', card: 'from-white to-slate-50', bar: 'bg-slate-400', hex: '#94a3b8' },
 };
 
-export const CHART_COLORS = ['#2f6df3', '#22c55e', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#94a3b8'];
+export const CHART_COLORS = ['#2563eb', '#2d725e', '#44597a', '#d99a2b', '#c2413b', '#0e9bb5', '#a8477c', '#94a3b8'];
 
 const BADGES = {
-  green: 'bg-emerald-100 text-emerald-700',
-  amber: 'bg-amber-100 text-amber-700',
-  red: 'bg-red-100 text-red-600',
-  blue: 'bg-blue-100 text-blue-700',
-  purple: 'bg-violet-100 text-violet-700',
-  slate: 'bg-slate-100 text-slate-600',
-  orange: 'bg-orange-100 text-orange-600',
-  pink: 'bg-pink-100 text-pink-600',
+  green: 'bg-emerald-100 text-emerald-900',
+  amber: 'bg-amber-100 text-amber-800',
+  red: 'bg-red-100 text-red-700',
+  blue: 'bg-[#dbeafe] text-[#1e40af]',
+  purple: 'bg-violet-100 text-violet-800',
+  slate: 'bg-slate-100 text-slate-700',
+  orange: 'bg-orange-100 text-orange-700',
+  pink: 'bg-pink-100 text-pink-700',
 };
 
 export const badgeClass = (tone) => BADGES[tone] || BADGES.slate;

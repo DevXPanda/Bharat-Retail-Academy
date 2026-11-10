@@ -1,9 +1,11 @@
+import PageFrame from '../components/PageFrame.jsx';
 import { Link } from 'react-router-dom';
-import { SUPPORT_EMAIL } from '../config.js';
+import { SUPPORT_EMAIL as DEFAULT_EMAIL } from '../config.js';
+import { useGet } from '@ecomedu/ui';
 
 const UPDATED = 'January 2026';
 
-const DOCS = {
+const buildDocs = (SUPPORT_EMAIL) => ({
   privacy: {
     title: 'Privacy Policy',
     sections: [
@@ -34,14 +36,13 @@ const DOCS = {
       ['Not refundable', 'Courses purchased with a discount coupon during special promotions, and certificates already issued, are not eligible for refund unless the offer says otherwise.'],
     ],
   },
-};
+});
 
 export default function Legal({ doc }) {
-  const { title, sections } = DOCS[doc];
+  const SUPPORT_EMAIL = useGet('/public/settings').data?.supportEmail || DEFAULT_EMAIL;
+  const { title, sections } = buildDocs(SUPPORT_EMAIL)[doc];
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <h1 className="text-4xl font-extrabold tracking-tight text-ink">{title}</h1>
-      <p className="mt-2 text-sm text-slate-500">Last updated: {UPDATED}</p>
+    <PageFrame title={title} description={`Last updated: ${UPDATED}`} className="academy-document">
       <div className="mt-8 space-y-7">
         {sections.map(([heading, body], i) => (
           <section key={heading}>
@@ -50,7 +51,7 @@ export default function Legal({ doc }) {
           </section>
         ))}
       </div>
-      <p className="mt-10 rounded-xl bg-slate-50 p-4 text-sm text-slate-600">Questions? <Link to="/contact" className="font-semibold text-brand-600 hover:underline">Contact us</Link> or write to {SUPPORT_EMAIL}.</p>
-    </div>
+      <p className="public-callout text-sm">Questions? <Link to="/contact" className="font-semibold text-brand-600 hover:underline">Contact us</Link> or write to {SUPPORT_EMAIL}.</p>
+    </PageFrame>
   );
 }

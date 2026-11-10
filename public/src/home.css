@@ -1,0 +1,151 @@
+/* Home page and the sign in popup. Palette: Sage #2D725E, Navy #14243A, Soft Sage #EEF4F0, with the logo orange as a small warm accent. */
+:root { --font-serif: 'Fraunces', Georgia, 'Times New Roman', serif; --accent: #e8590c; }
+
+/* Type: a soft serif for headlines gives the site a human, editorial voice; Inter stays for everything you read or click. */
+.display-serif, .public-site main h1, .public-site main h2 { font-family: var(--font-serif); font-weight: 600; letter-spacing: -0.015em; font-optical-sizing: auto; }
+.public-site h3, .public-site h4 { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.01em; }
+.public-site .section-heading h2 { font-size: 34px; line-height: 1.15; }
+.home-block { margin-top: 84px; }
+
+/* ---------- hero ---------- */
+.home-hero2 { background: radial-gradient(900px 420px at 88% -8%, #d8eadf 0, transparent 62%), radial-gradient(680px 360px at -4% 112%, #fbe9db 0, transparent 60%), #f1f6f2; }
+.hero2-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 56px; align-items: center; padding-block: 64px 76px; }
+.hero2-pill { display: inline-flex; align-items: center; gap: 9px; padding: 6px 14px; border: 1px solid #d6e5dc; border-radius: 999px; background: #ffffffd9; font-size: 12.5px; font-weight: 600; color: #14243a; }
+.hero2-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px #e8590c26; }
+.hero2-copy h1 { margin-top: 20px; font-size: clamp(38px, 5vw, 60px); line-height: 1.08; color: #14243a; letter-spacing: -0.025em; }
+.hero2-mark { color: #2d725e; text-decoration: underline wavy var(--accent) 2.5px; text-underline-offset: 9px; text-decoration-skip-ink: none; }
+.hero2-copy > p { max-width: 520px; margin-top: 22px; font-size: 17px; line-height: 1.7; color: #4b5d73; }
+.hero2-cta { min-height: 50px; padding: 12px 24px; border-radius: 12px; font-size: 14.5px; }
+.hero2-proof { display: flex; align-items: center; gap: 16px; margin-top: 34px; }
+.hero2-faces { display: flex; flex-shrink: 0; }
+.hero2-faces > span { margin-left: -10px; border: 2px solid #f1f6f2; border-radius: 50%; }
+.hero2-faces > span:first-child { margin-left: 0; }
+.hero2-proof p { max-width: 360px; font-size: 13.5px; line-height: 1.55; color: #536379; }
+.hero2-proof strong { color: #14243a; }
+.hero2-visual { position: relative; display: flex; min-height: 400px; align-items: center; justify-content: center; }
+.next-class, .welcome-card { position: relative; z-index: 1; display: block; width: 100%; max-width: 410px; padding: 26px; border: 1px solid #dbe6df; border-radius: 22px; background: #fff; box-shadow: 0 36px 70px -34px rgba(20, 36, 58, .4); }
+.next-class { transform: rotate(-1.2deg); transition: transform .25s ease, box-shadow .25s ease; }
+.next-class:hover { transform: rotate(0) translateY(-4px); box-shadow: 0 44px 80px -34px rgba(20, 36, 58, .45); }
+.next-class-tag { display: inline-block; padding: 5px 11px; border-radius: 999px; background: #e6f0ea; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #2d725e; }
+.next-class-tag.is-live { background: #fde8e6; color: #c2413b; }
+.sticker { position: absolute; z-index: 2; display: grid; width: 64px; height: 64px; place-items: center; border: 1px solid #e0eae4; border-radius: 18px; background: #fff; box-shadow: 0 14px 28px -14px rgba(20, 36, 58, .35); }
+.sticker-a { top: 2px; left: 2%; transform: rotate(-9deg); }
+.sticker-b { top: 6%; right: 0; transform: rotate(8deg); }
+.sticker-c { bottom: 14%; left: -2%; transform: rotate(7deg); }
+.sticker-d { bottom: 0; right: 7%; transform: rotate(-6deg); }
+.chip { position: absolute; z-index: 2; display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border: 1px solid #dbe6df; border-radius: 999px; background: #fff; font-size: 12.5px; font-weight: 600; color: #14243a; box-shadow: 0 12px 24px -14px rgba(20, 36, 58, .4); }
+.chip svg { color: #2d725e; }
+.chip-cert { bottom: 22%; right: -10px; }
+.chip-rec { top: 28%; left: -14px; }
+
+/* ---------- platform strip ---------- */
+.platform-strip { border-block: 1px solid #e3ebe6; background: #fff; padding-block: 22px; }
+.platform-strip .public-container { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 34px; }
+.platform-strip p { font-size: 13px; font-weight: 500; color: #6b7a8d; }
+.platform-strip div { display: flex; flex-wrap: wrap; gap: 10px 26px; }
+.platform-strip a { display: inline-flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 600; color: #3b4d63; transition: color .15s; }
+.platform-strip a:hover { color: #2d725e; }
+
+/* ---------- how it works ---------- */
+.how-band { margin-top: 92px; padding-block: 80px; background: #14243a; color: #fff; }
+.how-head { max-width: 640px; }
+.how-head .section-kicker { color: #8fb7a3; }
+.public-site .how-head h2 { margin-top: 10px; font-size: clamp(30px, 3.6vw, 40px); line-height: 1.15; color: #fff; }
+.how-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px; margin-top: 48px; counter-reset: none; list-style: none; padding: 0; }
+.how-num { display: block; font-family: var(--font-serif); font-size: 64px; line-height: 1; font-weight: 600; color: var(--accent); }
+.how-steps h3 { margin-top: 14px; font-size: 20px; font-weight: 700; color: #fff; }
+.how-steps p { margin-top: 10px; font-size: 15px; line-height: 1.7; color: #b4c3d6; }
+
+/* ---------- teachers ---------- */
+.teacher-card { display: flex; flex-direction: column; align-items: center; padding: 28px 20px 24px; border: 1px solid #e0e7e2; border-radius: 20px; background: #fff; text-align: center; transition: transform .2s ease, box-shadow .2s ease, border-color .2s; }
+.teacher-card:hover { transform: translateY(-4px); border-color: #bcd3c6; box-shadow: 0 22px 40px -26px rgba(20, 36, 58, .35); }
+.teacher-card h3 { margin-top: 16px; font-size: 17px; font-weight: 700; color: #14243a; }
+.teacher-card p { margin-top: 4px; font-size: 13px; color: #64748b; }
+.teacher-meta { display: flex; align-items: center; gap: 14px; margin-top: 14px; font-size: 12.5px; font-weight: 500; color: #536379; }
+.teacher-meta span { display: inline-flex; align-items: center; gap: 5px; }
+
+/* ---------- FAQ ---------- */
+.faq-grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 64px; }
+.faq-grid h2 { margin-top: 10px; font-size: 34px; line-height: 1.15; }
+.faq-list details { border-bottom: 1px solid #dfe6e1; padding-block: 20px; }
+.faq-list details:first-child { border-top: 1px solid #dfe6e1; }
+.faq-list summary { display: flex; cursor: pointer; align-items: center; justify-content: space-between; gap: 20px; list-style: none; font-size: 16.5px; font-weight: 600; color: #14243a; }
+.faq-list summary::-webkit-details-marker { display: none; }
+.faq-list summary::after { content: '+'; flex-shrink: 0; font-size: 22px; font-weight: 400; color: #2d725e; transition: transform .2s; }
+.faq-list details[open] summary::after { transform: rotate(45deg); }
+.faq-list details p { margin-top: 12px; max-width: 620px; font-size: 15px; line-height: 1.75; color: #536379; }
+
+/* ---------- counselling ---------- */
+.counsel { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 52px; align-items: center; padding: 52px; border: 1px solid #dbe8df; border-radius: 28px; background: #eef4f0; }
+.counsel-copy h2 { margin-top: 10px; font-size: 34px; line-height: 1.15; }
+.counsel-copy > p { margin-top: 14px; max-width: 440px; font-size: 16px; line-height: 1.7; color: #4b5d73; }
+.counsel-copy ul { margin-top: 24px; list-style: none; padding: 0; }
+.counsel-copy li { display: flex; align-items: flex-start; gap: 12px; margin-top: 14px; font-size: 15px; font-weight: 600; color: #14243a; }
+.counsel-copy li svg { margin-top: 3px; color: #2d725e; }
+.counsel-copy li small { display: block; margin-top: 2px; font-size: 12.5px; font-weight: 400; color: #64748b; }
+.counsel-copy a:hover { color: #2d725e; text-decoration: underline; }
+.counsel .enquiry-card { border-color: #dbe6df; border-radius: 20px; padding: 28px; box-shadow: 0 24px 48px -30px rgba(20, 36, 58, .35); }
+
+/* ---------- closing call to action ---------- */
+.final-cta { margin-top: 88px; margin-bottom: -44px; padding-block: 88px; background: linear-gradient(135deg, #14243a 0%, #1b4339 100%); text-align: center; color: #fff; }
+.public-site .final-cta h2 { max-width: 700px; margin-inline: auto; font-size: clamp(32px, 4.4vw, 46px); line-height: 1.12; color: #fff; }
+.final-cta p { margin-top: 16px; font-size: 16.5px; color: #c3d3e4; }
+.final-primary { background: #fff; color: #14243a; }
+.final-primary:hover { background: #eef4f0; }
+.final-secondary { border-color: #ffffff55; background: transparent; color: #fff; }
+.final-secondary:hover { background: #ffffff1a; }
+
+/* Account popups share the academy's quiet, practical styling. */
+.auth-overlay { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; overflow-y: auto; padding: 20px; background: rgba(23, 34, 29, .46); animation: auth-fade .16s ease; }
+.auth-dialog { width: 100%; max-width: 460px; overflow: hidden; border: 1px solid #dbded5; border-radius: 12px; background: #fffefa; box-shadow: 0 20px 70px #14243a26; animation: auth-rise .18s ease; }
+.auth-main { position: relative; max-height: calc(100dvh - 40px); overflow-y: auto; overscroll-behavior: contain; padding: 32px; }
+.auth-brand { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding-bottom: 22px; margin-bottom: 25px; border-bottom: 1px solid #e6e7df; }
+.auth-brand > span { color: #344a3c; font-size: 16px; font-weight: 600; letter-spacing: -.02em; }
+.auth-brand img { box-shadow: none; }
+.auth-title { font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 25px; font-weight: 600; line-height: 1.25; letter-spacing: -.035em; color: #263d31; }
+.auth-description { margin-top: 9px; max-width: 340px; color: #737c72; font-size: 13px; line-height: 1.7; }
+.auth-dialog form label > span:first-child { font-size: 12px; font-weight: 500; color: #40523f; }
+.auth-dialog .field-input { min-height: 44px; border: 1px solid #d9ddd2; border-radius: 5px; background: white; color: #293f31; font-size: 13px; box-shadow: none; }
+.auth-dialog .field-input::placeholder { color: #9aA294; }
+.auth-dialog .field-input:focus { border-color: #6b8d73; outline: 2px solid #dce7db; outline-offset: 1px; box-shadow: none; }
+.auth-dialog form button[type="submit"] { height: 45px; border-radius: 5px; background: #285b48; font-size: 13px; font-weight: 600; box-shadow: none; }
+.auth-dialog form button[type="submit"]:hover { background: #204b3b; }
+.auth-dialog form button[type="submit"]:disabled { opacity: .65; }
+.auth-dialog .auth-switch { margin-top: 24px; padding-top: 20px; border-top: 1px solid #e6e7df; text-align: center; color: #778170; font-size: 12px; line-height: 1.7; }
+.auth-dialog form button:not([type="submit"]) { font-size: 12px; }
+.auth-close { position: absolute; top: 13px; right: 13px; display: grid; width: 32px; height: 32px; place-items: center; border-radius: 5px; color: #81907f; transition: background .15s, color .15s; }
+.auth-close:hover { background: #eeefe8; color: #263d31; }
+.auth-dialog button:focus-visible, .auth-dialog a:focus-visible { outline: 2px solid #6b8d73; outline-offset: 3px; }
+@keyframes auth-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes auth-rise { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 960px) {
+  .hero2-grid { grid-template-columns: 1fr; gap: 44px; padding-block: 44px 56px; }
+  .hero2-visual { min-height: 0; padding-block: 22px; }
+  .how-steps { grid-template-columns: 1fr; gap: 30px; }
+  .faq-grid { grid-template-columns: 1fr; gap: 28px; }
+  .counsel { grid-template-columns: 1fr; padding: 32px 24px; gap: 32px; }
+}
+@media (max-width: 760px) {
+  .auth-main { padding: 30px 24px 26px; }
+}
+@media (max-width: 640px) {
+  .sticker, .chip { display: none; }
+  .home-block { margin-top: 64px; }
+  .public-site .section-heading h2, .faq-grid h2, .counsel-copy h2 { font-size: 28px; }
+  .hero2-proof { align-items: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) { .auth-overlay, .auth-dialog, .next-class { animation: none; transition: none; } }
+
+/* dark sections: beat the global heading colour */
+:root .public-site .how-band h2, :root .public-site .how-band h3, :root .public-site .final-cta h2 { color: #fff; }
+:root .public-site .how-band h3 { font-weight: 700; }
+
+/* floating bits sit around the card instead of on top of its text */
+.sticker-a { top: -6px; left: 4%; }
+.sticker-b { top: 0; right: -4px; }
+.sticker-c { bottom: 26%; left: -26px; }
+.sticker-d { bottom: 24%; right: -20px; }
+.chip-rec { top: auto; bottom: 6px; left: 8%; }
+.chip-cert { bottom: 6px; right: 8%; }
+.hero2-mark { text-decoration-thickness: 2px; }

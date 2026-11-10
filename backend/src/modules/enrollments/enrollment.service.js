@@ -59,6 +59,8 @@ export async function enrollStudent({ studentId, courseId, batchId, accessStart,
       body: `You now have access to ${course.title}.`,
       type: 'enrollment',
       link: `/app/courses/${course._id}`,
+      section: 'courses',
+      ref: course._id,
     });
   }
 
@@ -66,6 +68,6 @@ export async function enrollStudent({ studentId, courseId, batchId, accessStart,
 }
 
 export async function refreshStudentStatus(studentId) {
-  const hasAccess = await Enrollment.exists({ student: studentId, status: { $in: ['active', 'completed'] } });
-  await User.updateOne({ _id: studentId, status: { $ne: 'inactive' } }, { status: hasAccess ? 'active' : 'pending' });
+  // A student whose email is verified is simply active; owning a course is not an approval step. Only an admin deactivates.
+  await User.updateOne({ _id: studentId, status: { $ne: 'inactive' }, emailVerified: { $ne: false } }, { status: 'active' });
 }

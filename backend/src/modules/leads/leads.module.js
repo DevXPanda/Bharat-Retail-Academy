@@ -5,7 +5,7 @@ import { authenticate, authorize } from '../../middleware/auth.js';
 import { validate } from '../../middleware/validate.js';
 import { ApiError } from '../../utils/ApiError.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
-import { sendCsv } from '../../utils/csv.js';
+import { sendExcel } from '../../utils/excel.js';
 import { dateRangeFilter, escapeRegex, mergeFilters, monthTrend, paginate } from '../../utils/query.js';
 import { noContent, ok } from '../../utils/response.js';
 
@@ -52,10 +52,11 @@ router.get(
   validate({ query: filterQuery }),
   asyncHandler(async (req, res) => {
     const rows = await Lead.find(buildFilter(req.query)).sort({ createdAt: -1 }).limit(5000);
-    sendCsv(
-      res,
-      'leads.csv',
-      [
+    await sendExcel(res, {
+      filename: 'leads.xlsx',
+      title: 'Leads & enquiries',
+      rows,
+      columns: [
         { label: 'Name', value: (l) => l.name },
         { label: 'Email', value: (l) => l.email },
         { label: 'Phone', value: (l) => l.phone },
@@ -63,10 +64,9 @@ router.get(
         { label: 'Goal', value: (l) => l.goal },
         { label: 'Message', value: (l) => l.message },
         { label: 'Status', value: (l) => l.status },
-        { label: 'Received', value: (l) => l.createdAt.toISOString() },
+        { label: 'Received', value: (l) => l.createdAt.toLocaleString('en-IN') },
       ],
-      rows,
-    );
+    });
   }),
 );
 

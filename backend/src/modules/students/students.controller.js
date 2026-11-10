@@ -1,6 +1,6 @@
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { created, noContent, ok } from '../../utils/response.js';
-import { sendCsv } from '../../utils/csv.js';
+import { sendExcel } from '../../utils/excel.js';
 import { formatDate } from '../../utils/format.js';
 import { collectPages } from '../../utils/query.js';
 import * as service from './students.service.js';
@@ -14,10 +14,11 @@ export const summary = asyncHandler(async (_req, res) => ok(res, await service.s
 
 export const exportCsv = asyncHandler(async (req, res) => {
   const items = await collectPages((page, limit) => service.listStudents(req.user, { ...req.query, page, limit }));
-  sendCsv(
-    res,
-    'students.csv',
-    [
+  await sendExcel(res, {
+    filename: 'students.xlsx',
+    title: 'Students',
+    rows: items,
+    columns: [
       { label: 'Student ID', value: (s) => s.studentCode },
       { label: 'Name', value: (s) => s.name },
       { label: 'Email', value: (s) => s.email },
@@ -26,8 +27,29 @@ export const exportCsv = asyncHandler(async (req, res) => {
       { label: 'Status', value: (s) => s.status },
       { label: 'Joined', value: (s) => formatDate(s.createdAt) },
     ],
-    items,
-  );
+  });
+});
+
+export const exportRoster = asyncHandler(async (req, res) => {
+  const ids = String(req.query.ids || '').split(',').filter(Boolean).slice(0, 200);
+  const items = await service.rosterByIds(req.user, ids);
+  await sendExcel(res, {
+    filename: 'my-students.xlsx',
+    title: 'My students',
+    rows: items,
+    columns: [
+      { label: 'Student ID', value: (e) => e.student.studentCode },
+      { label: 'Name', value: (e) => e.student.name },
+      { label: 'Email', value: (e) => e.student.email },
+      { label: 'Phone', value: (e) => e.student.phone },
+      { label: 'Course', value: (e) => e.course.title },
+      { label: 'Batch', value: (e) => e.batch?.name },
+      { label: 'Joined', value: (e) => formatDate(e.createdAt) },
+      { label: 'Progress', value: (e) => e.progress, format: 'percent' },
+      { label: 'Classes attended', value: (e) => `${e.classes.attended} / ${e.classes.total}` },
+      { label: 'Status', value: (e) => e.status },
+    ],
+  });
 });
 
 export const conversation = asyncHandler(async (req, res) => ok(res, await service.studentConversation(req.params.id, req.params.conversationId)));

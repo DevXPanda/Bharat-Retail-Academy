@@ -99,7 +99,7 @@ export default function Certificates() {
   ];
 
   const donut = [
-    { name: 'Verified', value: summary?.verified.value || 0, color: '#22c55e' },
+    { name: 'Verified', value: summary?.verified.value || 0, color: '#2d725e' },
     { name: 'Pending', value: summary?.pending.value || 0, color: '#f59e0b' },
     { name: 'Revoked', value: summary?.revoked.value || 0, color: '#ef4444' },
     { name: 'Expired', value: summary?.expired.value || 0, color: '#94a3b8' },

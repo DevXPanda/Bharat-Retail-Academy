@@ -1,0 +1,148 @@
+/* Home-only art direction. Shared portals and catalogue pages keep their styles. */
+.academy-home {
+  --home-paper: #faf9f5;
+  --home-ink: #233d34;
+  --home-muted: #68736b;
+  --home-line: #dedfd6;
+  background: var(--home-paper);
+  color: var(--home-ink);
+  padding-bottom: 80px;
+}
+.public-site .academy-home .public-container { max-width: 1208px; }
+.public-site .academy-home h1, .public-site .academy-home h2 { color: var(--home-ink); font-weight: 500; }
+.academy-home .home-block { margin-top: 88px; }
+.academy-home .section-kicker { color: #626e61; font-size: 10px; font-weight: 600; letter-spacing: .13em; }
+.public-site .academy-home .section-heading h2 { margin-top: 0; font-size: clamp(28px, 3vw, 38px); line-height: 1.2; }
+.academy-home .section-heading { gap: 24px; margin-bottom: 30px; }
+.academy-home .section-description { margin-top: 12px; font-size: 14px; line-height: 1.7; color: var(--home-muted); }
+.academy-home .text-link { color: #285b48; font-size: 12px; }
+.academy-home .text-link:hover { text-decoration: underline; text-underline-offset: 5px; }
+.academy-home :is(a, button, summary):focus-visible { outline: 2px solid #bc603b; outline-offset: 5px; }
+.academy-home .public-primary { border-radius: 5px; background: #285b48; box-shadow: none; }
+.academy-home .public-primary:hover { background: #1e4939; }
+
+/* Centred hero introduction. */
+.academy-home .home-hero2 { background: var(--home-paper); border-bottom: 1px solid var(--home-line); }
+.academy-home .hero2-grid { grid-template-columns: minmax(0, 1fr); gap: 32px; padding-block: 64px 58px; align-items: center; }
+.academy-home .hero2-copy { width: 100%; max-width: 1160px; margin-inline: auto; padding-top: 16px; text-align: center; }
+.public-site .academy-home .hero2-copy h1 { margin-top: 0; font-size: clamp(36px, 4.2vw, 60px); line-height: 1.08; letter-spacing: -.045em; text-wrap: initial; }
+.academy-home .hero2-headline { display: block; }
+.academy-home .hero2-mark { display: block; margin-top: 8px; color: #a85c3b; text-decoration: none; font-style: italic; }
+.academy-home .hero2-copy > p { max-width: 520px; margin: 24px auto 0; font-size: 15px; line-height: 1.85; color: #647066; }
+.academy-home .hero2-actions { justify-content: center; }
+.academy-home .hero2-cta { min-height: 48px; padding: 13px 22px; font-size: 13px; border-radius: 5px; }
+.academy-home .hero-text-cta { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; gap: 9px; padding-inline: 12px; font-size: 12px; font-weight: 600; color: #324d3d; }
+.academy-home .hero-text-cta:hover { text-decoration: underline; text-underline-offset: 5px; }
+.academy-home .hero2-notes { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px 14px; margin-top: 18px; font-size: 11px; color: #657366; }
+.academy-home .hero2-notes > span + span { padding-left: 14px; border-left: 1px solid #cdd2c7; }
+
+/* Two identical groups keep the horizontal loop seamless. */
+.academy-home .platform-strip { padding-block: 23px; background: #f4f3ed; border: 0; border-bottom: 1px solid var(--home-line); }
+.academy-home .platform-strip .platform-slider { display: block; overflow: hidden; padding-inline: 0; }
+.academy-home .platform-strip .platform-track { display: flex; flex-wrap: nowrap; width: max-content; gap: 0; animation: platform-scroll 40s linear infinite; }
+.academy-home .platform-strip .platform-slide-group { display: flex; flex-wrap: nowrap; flex-shrink: 0; align-items: center; justify-content: space-around; gap: 44px; min-width: 1208px; padding-right: 44px; }
+.academy-home .platform-strip a { display: inline-flex; flex-shrink: 0; align-items: center; gap: 10px; padding-block: 5px; white-space: nowrap; font-size: 13px; color: #405440; }
+.academy-home .platform-strip a:hover { color: #285b48; }
+.academy-home .platform-strip .platform-logo { background: transparent; box-shadow: none; }
+.academy-home .platform-slider:hover .platform-track, .academy-home .platform-slider:focus-within .platform-track { animation-play-state: paused; }
+@keyframes platform-scroll { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .academy-home .platform-strip .platform-slider { overflow-x: auto; }
+  .academy-home .platform-strip .platform-track { animation: none; }
+  .academy-home .platform-strip .platform-slide-group[aria-hidden="true"] { display: none; }
+}
+
+/* Tabs and course cards use the same restrained rules as the page. */
+.academy-home .platform-filters { gap: 0; padding: 0; margin-bottom: 28px; border-bottom: 1px solid var(--home-line); border-radius: 0; overflow-x: auto; flex-wrap: nowrap; }
+.academy-home .platform-filters button { flex-shrink: 0; gap: 8px; margin-bottom: -1px; padding: 12px 17px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: #73786e; font-size: 12px; box-shadow: none; }
+.academy-home .platform-filters button:first-child { padding-left: 0; }
+.academy-home .platform-filters button.selected { color: #244c3d; border-bottom-color: #244c3d; background: transparent; }
+.academy-home .platform-filters button:hover { color: #244c3d; background: #efefe6; }
+.academy-home .platform-filters small { background: transparent; color: inherit; font-size: 10px; padding: 0; }
+.academy-home .course-card { border-color: #dedfd6; border-radius: 7px; box-shadow: none; }
+.academy-home .course-card:hover { border-color: #819885; box-shadow: none; }
+.academy-home .course-cover { min-height: 165px; background: #eeede4; border-bottom: 1px solid #dedfd6; }
+.academy-home .course-cover.platform-amazon { background: #f1e8d5; }
+.academy-home .course-cover.platform-flipkart { background: #e6ebdf; }
+.academy-home .course-cover.platform-meesho { background: #f1e3de; }
+.academy-home .course-cover.platform-shopify { background: #e4ebd8; }
+.academy-home .course-cover-label { color: #40513f; font-family: var(--font-serif); font-size: 27px; font-weight: 500; }
+.academy-home .course-level { border-radius: 3px; box-shadow: none; font-size: 9px; }
+.academy-home .course-card h3 { font-size: 16px; font-weight: 600; line-height: 1.5; }
+.academy-home .course-link { border-radius: 4px; background: #eff2e9; color: #31523e; }
+
+/* A compact numbered list replaces three more matching feature cards. */
+.academy-home .how-band { margin-top: 88px; padding-block: 55px; background: #eceee4; color: var(--home-ink); border-block: 1px solid #daddd0; }
+.academy-home .how-band > .public-container { display: grid; grid-template-columns: .9fr 1.1fr; gap: 100px; }
+.academy-home .how-head { padding-top: 10px; }
+.academy-home .how-head .section-kicker { color: #65735c; }
+:root .public-site .academy-home .how-head h2 { margin-top: 0; color: var(--home-ink); font-size: 39px; line-height: 1.15; }
+.academy-home .how-head > p { margin-top: 18px; font-size: 13px; line-height: 1.7; color: #6c7867; }
+.academy-home .how-steps { display: flex; flex-direction: column; gap: 0; margin: 0; }
+.academy-home .how-steps li { display: flex; align-items: flex-start; gap: 24px; padding-block: 22px; border-top: 1px solid #d0d7c7; }
+.academy-home .how-steps li:first-child { border-top: 0; padding-top: 10px; }
+.academy-home .how-steps li:last-child { padding-bottom: 0; }
+.academy-home .how-num { min-width: 28px; font-family: inherit; font-size: 12px; line-height: 1.7; font-weight: 500; color: #9b633f; }
+:root .public-site .academy-home .how-steps h3 { margin: 0; color: #2d4432; font-size: 15px; font-weight: 600; }
+.academy-home .how-steps p { margin-top: 8px; font-size: 12px; line-height: 1.8; color: #6a7664; }
+
+.academy-home .teacher-card { align-items: flex-start; padding: 25px 22px 20px; border: 1px solid #dedfd6; border-radius: 6px; text-align: left; background: #fffefa; box-shadow: none; }
+.academy-home .teacher-card:hover { transform: none; border-color: #819885; box-shadow: none; }
+.academy-home .teacher-card h3 { margin-top: 22px; font-size: 16px; font-weight: 600; }
+.academy-home .teacher-card p { font-size: 12px; line-height: 1.7; }
+.academy-home .teacher-meta { margin-top: 16px; font-size: 11px; }
+.academy-home .teacher-profile-link { display: flex; align-items: center; justify-content: space-between; align-self: stretch; gap: 8px; margin-top: auto; padding-top: 20px; color: #466342; font-size: 11px; }
+.academy-home .session-card { border-color: #dedfd6; border-radius: 6px; background: #fffefa; box-shadow: none; }
+.academy-home .session-card:hover { border-color: #819885; box-shadow: none; }
+.academy-home .certificate-strip { padding: 25px 0; border-inline: 0; border-block: 1px solid var(--home-line); border-radius: 0; background: transparent; }
+.public-site .academy-home .certificate-strip h2 { font-family: inherit; font-size: 15px; font-weight: 600; }
+.academy-home .certificate-strip p { font-size: 12px; }
+.academy-home .certificate-icon { border-radius: 0; background: transparent; color: #7b865e; }
+.academy-home .faq-grid { gap: 100px; }
+.public-site .academy-home .faq-grid h2 { margin-top: 0; font-size: 36px; line-height: 1.2; }
+.academy-home .faq-grid > div > p { max-width: 320px; font-size: 13px; line-height: 1.8; color: var(--home-muted); }
+.academy-home .faq-list details { padding-block: 19px; border-color: var(--home-line); }
+.academy-home .faq-list summary { font-size: 13px; font-weight: 500; line-height: 1.6; color: #344c3c; }
+.academy-home .faq-list details p { font-size: 12px; color: var(--home-muted); }
+.academy-home .counsel { grid-template-columns: 1fr 1fr; gap: 65px; padding: 44px; border-radius: 7px; border-color: #dddcd0; background: #efeee4; }
+.public-site .academy-home .counsel-copy h2 { margin-top: 0; font-size: 42px; line-height: 1.15; }
+.academy-home .counsel-copy > p { margin-top: 18px; font-size: 13px; line-height: 1.85; color: var(--home-muted); }
+.academy-home .counsel-copy li { font-size: 13px; }
+.academy-home .counsel .enquiry-card { padding: 24px; border: 1px solid #ddded3; border-radius: 5px; background: #fffefa; box-shadow: none; }
+.academy-home .enquiry-card .field-input { font-size: 12px; border-radius: 4px; background: #fffefa; }
+
+@media (max-width: 1100px) {
+  .academy-home .hero2-grid { gap: 40px; }
+  .academy-home .how-band > .public-container, .academy-home .faq-grid { gap: 50px; }
+}
+@media (max-width: 800px) {
+  .academy-home .hero2-grid { grid-template-columns: 1fr; gap: 38px; padding-block: 30px 40px; }
+  .academy-home .hero2-copy { padding-top: 0; }
+  .public-site .academy-home .hero2-copy h1 { font-size: clamp(34px, 5.5vw, 44px); }
+  .academy-home .hero2-copy > p { max-width: 530px; }
+  .academy-home .home-block { margin-top: 60px; }
+  .academy-home .how-band { margin-top: 60px; padding-block: 40px; }
+  .academy-home .how-band > .public-container { gap: 35px; grid-template-columns: 1fr 1.3fr; }
+  .academy-home .faq-grid { grid-template-columns: 1fr; gap: 26px; }
+  .academy-home .faq-grid > div > p { max-width: 460px; }
+  .academy-home .counsel { gap: 30px; padding: 28px; grid-template-columns: 1fr; }
+}
+@media (max-width: 540px) {
+  .academy-home { padding-bottom: 48px; }
+  .academy-home .hero2-cta { padding-inline: 17px; font-size: 12px; }
+  .academy-home .hero-text-cta { padding-inline: 4px; font-size: 11px; }
+  .academy-home .section-heading { align-items: flex-start; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+  .academy-home .section-heading > .text-link { padding-top: 0; }
+  .academy-home .section-description { font-size: 12px; }
+  .academy-home .platform-filters button { padding-inline: 12px; font-size: 11px; }
+  .academy-home .how-band > .public-container { grid-template-columns: 1fr; gap: 30px; }
+  :root .public-site .academy-home .how-head h2 { font-size: 34px; }
+  .academy-home .how-steps li { gap: 16px; }
+  .academy-home .certificate-strip { gap: 18px; }
+  .public-site .academy-home .certificate-strip h2 { font-size: 14px; }
+  .academy-home .certificate-strip > div:last-child { flex-wrap: wrap; }
+  .public-site .academy-home .faq-grid h2 { font-size: 30px; }
+  .academy-home .counsel { padding: 26px 18px 18px; }
+  .public-site .academy-home .counsel-copy h2 { font-size: 35px; }
+  .academy-home .counsel .enquiry-card { padding: 20px 16px; }
+}

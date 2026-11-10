@@ -1,4 +1,4 @@
-# EcomEdu
+# Bharat Retail Academy
 
 E-commerce learning platform: public portal + student area, admin panel, teacher portal and a Node/MongoDB API.
 

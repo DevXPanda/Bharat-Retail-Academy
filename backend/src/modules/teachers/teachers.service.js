@@ -9,6 +9,7 @@ import { classChatFor, conversationsFor, loginsFor, threadFor } from '../../serv
 import { ApiError } from '../../utils/ApiError.js';
 import { mergeFilters, monthTrend, paginate, searchFilter } from '../../utils/query.js';
 import { teacherStudentIds } from '../../services/scope.js';
+import { queueMail } from '../../services/mail/index.js';
 
 const maskAccount = (n) => (n ? `${'X'.repeat(Math.max(0, n.length - 4))}${n.slice(-4)}` : n);
 const isMasked = (n) => /^[X*]+\d{0,4}$/i.test(n || '');
@@ -93,6 +94,7 @@ export async function createTeacher(payload) {
     },
   });
   await assignCourses(teacher._id, courseIds);
+  queueMail(teacher, 'teacherCredentials', { email, password });
   return (await decorate([teacher]))[0];
 }
 

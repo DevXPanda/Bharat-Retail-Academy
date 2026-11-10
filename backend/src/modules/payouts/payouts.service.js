@@ -7,6 +7,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { dateRangeFilter, escapeRegex, mergeFilters, monthBounds, paginate, percentChange } from '../../utils/query.js';
 import { round2 } from '../../utils/format.js';
 import { notifyUsers } from '../../services/notify.js';
+import { queueMail } from '../../services/mail/index.js';
 
 const POPULATE = [{ path: 'teacher', select: 'name email avatar teacher.bank' }];
 
@@ -121,7 +122,12 @@ export async function processPayout(id, { status, method, transactionId, failure
   await payout.save();
 
   if (status === 'paid') {
-    await notifyUsers([payout.teacher], { title: 'Payout sent', body: `₹${payout.amount} for ${payout.periodLabel} has been paid.`, type: 'payout', link: '/earnings' });
+    await notifyUsers([payout.teacher], { title: 'Payout sent', body: `₹${payout.amount} for ${payout.periodLabel} has been paid.`, type: 'payout', link: '/earnings', section: 'earnings', ref: payout.id });
+  }
+  if (status === 'paid' || status === 'failed') {
+    const teacher = await User.findById(payout.teacher).select('name email role status');
+    const info = { period: payout.periodLabel, amount: payout.amount, classes: payout.classesConducted, method: payout.method, transactionId: payout.transactionId, paidAt: payout.payoutDate, reason: payout.failureReason };
+    if (teacher) queueMail(teacher, status === 'paid' ? 'payoutPaid' : 'payoutFailed', info);
   }
   return payout.populate(POPULATE);
 }

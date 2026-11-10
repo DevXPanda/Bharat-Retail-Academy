@@ -9,7 +9,9 @@ import { dateRangeFilter, escapeRegex, mergeFilters, monthBounds, paginate, perc
 import { randomId } from '../../utils/slug.js';
 import { nextSequence } from '../../models/Counter.js';
 import { computePrice, getSettings } from '../../services/settings.js';
+import { brandInfo } from '../../services/brand.js';
 import { notifyUsers } from '../../services/notify.js';
+import { queueAdminMail, queueMail } from '../../services/mail/index.js';
 import { enrollStudent, refreshStudentStatus } from '../enrollments/enrollment.service.js';
 import PDFDocument from 'pdfkit';
 import { verifyCheckoutSignature, verifyWebhookSignature } from './razorpay.signature.js';
@@ -79,9 +81,15 @@ export async function markSuccessful(payment, razorpayPaymentId, signature) {
     payment.batch = enrollment.batch;
     await payment.save();
   }
-  await notifyUsers([payment.student], { title: 'Payment successful', body: 'Your course is now unlocked. Happy learning!', type: 'payment', link: '/app/courses' });
+  await notifyUsers([payment.student], { title: 'Payment successful', body: 'Your course is now unlocked. Happy learning!', type: 'payment', link: '/app/courses', section: 'courses', ref: payment.course });
   const admins = await User.distinct('_id', { role: 'admin' });
-  await notifyUsers(admins, { title: 'New enrollment', body: `Payment of ₹${payment.amount} received.`, type: 'payment' });
+  await notifyUsers(admins, { title: 'New enrollment', body: `Payment of ₹${payment.amount} received.`, type: 'payment', link: '/payments', section: 'payments', ref: payment.id });
+  const [buyer, course] = await Promise.all([User.findById(payment.student).select('name email role status'), Course.findById(payment.course).select('title')]);
+  if (buyer && payment.amount > 0) {
+    const info = { course: course?.title || 'Your course', amount: payment.amount, gstAmount: payment.gstAmount, gstPercent: payment.gstPercent, invoiceNumber: payment.invoiceNumber, transactionId: payment.transactionId, paidAt: payment.paidAt };
+    queueMail(buyer, 'paymentReceipt', info);
+    queueAdminMail('adminPayment', { ...info, student: buyer.name });
+  }
   return payment;
 }
 
@@ -137,7 +145,9 @@ async function applyRefund(payment, { amount, razorpayRefundId, reason }) {
     await Enrollment.updateOne({ student: payment.student, course: payment.course }, { status: 'inactive' });
     await refreshStudentStatus(payment.student);
   }
-  await notifyUsers([payment.student], { title: 'Refund processed', body: `₹${amount} will reach your account in 5-7 working days.`, type: 'payment' });
+  const [refunded, refundedCourse] = await Promise.all([User.findById(payment.student).select('name email role status'), Course.findById(payment.course).select('title')]);
+  if (refunded) queueMail(refunded, 'refundProcessed', { course: refundedCourse?.title || 'your course', amount, reference: razorpayRefundId });
+  await notifyUsers([payment.student], { title: 'Refund processed', body: `₹${amount} will reach your account in 5-7 working days.`, type: 'payment', link: '/app/payments', section: 'payments', ref: payment.id });
 }
 
 export async function refundPayment(id, { amount, reason }) {
@@ -241,9 +251,12 @@ export async function streamInvoice(id, actor, res) {
   res.setHeader('Content-Disposition', `attachment; filename="${payment.invoiceNumber}.pdf"`);
   doc.pipe(res);
 
-  doc.fontSize(20).fillColor('#0b1b3f').text(settings.businessName, 50, 50);
-  doc.fontSize(9).fillColor('#555').text([settings.address, settings.gstin && `GSTIN: ${settings.gstin}`, settings.supportEmail, settings.supportPhone].filter(Boolean).join('\n'), 50, 78);
-  doc.fontSize(22).fillColor('#1a5ce6').text(pricing.gstPercent ? 'TAX INVOICE' : 'INVOICE', 350, 50, { width: 195, align: 'right' });
+  const brand = await brandInfo();
+  if (brand.logoSmall) doc.image(brand.logoSmall, 50, 42, { width: 62 });
+  const textX = brand.logoSmall ? 124 : 50;
+  doc.fontSize(18).fillColor('#0b1b3f').text(settings.businessName, textX, 48, { width: 230 });
+  doc.fontSize(8.5).fillColor('#555').text([settings.address, settings.gstin && `GSTIN: ${settings.gstin}`, settings.supportEmail, settings.supportPhone].filter(Boolean).join('\n'), textX, 74, { width: 230 });
+  doc.fontSize(22).fillColor('#0b1b3f').text(pricing.gstPercent ? 'TAX INVOICE' : 'INVOICE', 350, 50, { width: 195, align: 'right' });
   doc.fontSize(9).fillColor('#333').text(`Invoice no: ${payment.invoiceNumber}
 Date: ${(payment.paidAt || payment.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
 Payment ID: ${payment.transactionId || '-'}

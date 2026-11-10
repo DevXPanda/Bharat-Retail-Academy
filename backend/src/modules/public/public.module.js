@@ -1,4 +1,6 @@
 import { Router } from 'express';
+import { publicFormLimiter } from '../../middleware/security.js';
+import { queueAdminMail } from '../../services/mail/index.js';
 import { z } from 'zod';
 import Course from '../../models/Course.js';
 import User from '../../models/User.js';
@@ -13,6 +15,7 @@ import { created, ok } from '../../utils/response.js';
 import { verifyToken } from '../../utils/token.js';
 import { verifyPublic } from '../certificates/certificates.service.js';
 import { publicBlogRouter } from '../blog/blog.module.js';
+import { notifyUsers } from '../../services/notify.js';
 import { getSettings, publicSettings } from '../../services/settings.js';
 
 const INSTRUCTOR = 'name avatar teacher.designation teacher.expertise teacher.experienceYears';
@@ -192,11 +195,17 @@ router.get('/certificates/:certificateId', asyncHandler(async (req, res) => ok(r
 
 router.post(
   '/leads',
+  publicFormLimiter,
   validate({ body: leadBody }),
   asyncHandler(async (req, res) => {
     const { source, email } = req.body;
     const duplicate = source === 'newsletter' && (await Lead.exists({ email: email.toLowerCase(), source }));
-    if (!duplicate) await Lead.create({ ...req.body, phone: req.body.phone || undefined });
+    if (!duplicate) {
+      const lead = await Lead.create({ ...req.body, phone: req.body.phone || undefined });
+      const admins = await User.distinct('_id', { role: 'admin', status: 'active' });
+      await notifyUsers(admins, { title: 'New enquiry', body: `${req.body.name || req.body.email || 'Someone'} sent an enquiry.`, type: 'lead', link: '/leads', section: 'leads', ref: lead.id }).catch(() => {});
+      queueAdminMail('adminLead', req.body);
+    }
     created(res, { received: true });
   }),
 );

@@ -245,6 +245,8 @@ export async function createClass(actor, payload) {
       body: `${cls.title} on ${cls.startsAt.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}`,
       type: 'live-class',
       link: `/app/live-classes?class=${cls.id}`,
+      section: 'live-classes',
+      ref: cls.id,
     });
   }
   return getClass(cls.id, actor);
@@ -272,7 +274,7 @@ export async function updateClass(id, actor, payload) {
 
   if (next.status === 'cancelled') {
     const students = await Enrollment.distinct('student', eligibleFilter(cls));
-    await notifyUsers(students, { title: 'Class cancelled', body: `${cls.title} has been cancelled.`, type: 'live-class' });
+    await notifyUsers(students, { title: 'Class cancelled', body: `${cls.title} has been cancelled.`, type: 'live-class', link: '/app/live-classes', section: 'live-classes', ref: id });
     emitToRoom(`class:${id}`, 'class:ended', { id, status: 'cancelled' });
   }
   return getClass(id, actor);
@@ -291,7 +293,7 @@ export async function startClass(id, actor) {
   await cls.save();
 
   const students = await Enrollment.distinct('student', eligibleFilter(cls));
-  await notifyUsers(students, { title: 'Class is live now', body: `${cls.title} has started. Join now!`, type: 'live-class', link: `/app/live-classes?class=${id}` });
+  await notifyUsers(students, { title: 'Class is live now', body: `${cls.title} has started. Join now!`, type: 'live-class', link: `/app/live-classes?class=${id}`, section: 'live-classes', ref: id });
   emitToRoom(`course:${cls.course._id}`, 'class:live', { id });
   return getClass(id, actor);
 }

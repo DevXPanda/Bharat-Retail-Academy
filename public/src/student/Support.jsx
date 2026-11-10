@@ -2,45 +2,9 @@ import { StudentTable as DataTable } from './components/StudentTable.jsx';
 import { useState } from 'react';
 import { CheckCircle2, Headset, Inbox, Loader, Plus } from 'lucide-react';
 import {
-  Button, Card, Field, Input, Modal, PageHeader, PriorityBadge, Select, StatCard, StatGrid, StatusBadge, TableCard, TableFooter, Tabs, Textarea, TicketThread,
-  TICKET_CATEGORY_LABELS, formatDate, useAction, useClient, useGet, useListState,
+  Button, Card, Modal, PageHeader, PriorityBadge, StatCard, StatGrid, StatusBadge, TableCard, TableFooter, Tabs, TicketComposer, TicketThread,
+  TICKET_CATEGORY_LABELS, formatDate, useGet, useListState,
 } from './ui.js';
-
-const BLANK = { subject: '', category: 'other', priority: 'medium', message: '' };
-
-function NewTicketModal({ open, onClose, onCreated }) {
-  const client = useClient();
-  const [form, setForm] = useState(BLANK);
-  const [errors, setErrors] = useState({});
-  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
-
-  const create = useAction(() => client.post('/tickets', { ...form, subject: form.subject.trim(), message: form.message.trim() }), {
-    success: 'Ticket raised. Our team will reply soon.',
-    invalidate: ['/tickets'],
-    onSuccess: ({ data }) => { setForm(BLANK); onCreated(data.id); onClose(); },
-  });
-
-  const submit = () => {
-    const next = {};
-    if (form.subject.trim().length < 5) next.subject = 'Enter a short subject (min 5 characters)';
-    if (form.message.trim().length < 10) next.message = 'Describe the issue in a few words';
-    setErrors(next);
-    if (!Object.keys(next).length) create.run();
-  };
-
-  return (
-    <Modal open={open} onClose={onClose} title="Raise a support ticket" subtitle="Tell us what went wrong and we will get back to you inside the platform." footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button loading={create.loading} onClick={submit}>Submit ticket</Button></>}>
-      <div className="space-y-4">
-        <Field label="Subject" required error={errors.subject}><Input value={form.subject} onChange={(e) => set('subject', e.target.value)} placeholder="e.g. Payment deducted but course not unlocked" /></Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Category"><Select value={form.category} onChange={(e) => set('category', e.target.value)}>{Object.entries(TICKET_CATEGORY_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</Select></Field>
-          <Field label="Priority"><Select value={form.priority} onChange={(e) => set('priority', e.target.value)}><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></Select></Field>
-        </div>
-        <Field label="Describe the issue" required error={errors.message}><Textarea rows={5} value={form.message} onChange={(e) => set('message', e.target.value)} placeholder="Share order ID, class name or any detail that helps us resolve it faster." /></Field>
-      </div>
-    </Modal>
-  );
-}
 
 export default function Support() {
   const list = useListState({ status: 'all' }, { limit: 8 });
@@ -69,7 +33,7 @@ export default function Support() {
 
   return (
     <>
-      <PageHeader title="Support" subtitle="Raise a ticket for payments, course access, live classes or certificates." actions={<Button size="lg" icon={Plus} onClick={() => setCreating(true)}>New Ticket</Button>} />
+      <PageHeader title="Support" subtitle="Pick your issue, we check your records and resolve it. Track every ticket's progress here." actions={<Button size="lg" icon={Plus} onClick={() => setCreating(true)}>New Ticket</Button>} />
 
       <StatGrid cols={4}>
         <StatCard icon={Headset} tone="blue" label="My Tickets" value={summary?.total.value ?? '—'} />
@@ -89,7 +53,7 @@ export default function Support() {
         </Card>
       </div>
 
-      <NewTicketModal open={creating} onClose={() => setCreating(false)} onCreated={setSelectedId} />
+      <TicketComposer open={creating} onClose={() => setCreating(false)} onCreated={setSelectedId} overlay={Modal} />
     </>
   );
 }

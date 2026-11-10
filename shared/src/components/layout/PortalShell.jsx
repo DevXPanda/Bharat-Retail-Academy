@@ -3,6 +3,7 @@ import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-do
 import { LogOut, Menu, Search, X } from 'lucide-react';
 import { useAuth } from '../../context/AppProviders.jsx';
 import { cx } from '../../lib/format.js';
+import { sectionFromPath, useMarkSectionSeen, useSectionNotifications } from '../../hooks/notifications.js';
 import { BrandMark, BrandName } from './Brand.jsx';
 import { NotificationBell } from './NotificationBell.jsx';
 import { ProfileMenu } from './ProfileMenu.jsx';
@@ -14,7 +15,7 @@ const GROUPS = [
   { title: 'Communication', paths: ['/messages', '/reviews', '/leads', '/support', '/blog'] },
 ];
 
-export function PortalShell({ brand, nav, badges, groups = GROUPS, basePath = '', searchHome = '/students', profilePath, roleLabel = 'Admin', searchPlaceholder }) {
+export function PortalShell({ brand, nav, groups = GROUPS, basePath = '', searchHome = '/students', profilePath, roleLabel = 'Admin', searchPlaceholder, brandTo, brandLabel }) {
   const { logout } = useAuth();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -23,6 +24,13 @@ export function PortalShell({ brand, nav, badges, groups = GROUPS, basePath = ''
   const [search, setSearch] = useState('');
   const menuButton = useRef(null);
   const drawerRef = useRef(null);
+  const { counts } = useSectionNotifications();
+  const markSeen = useMarkSectionSeen();
+  const openSection = sectionFromPath(pathname);
+  const openCount = openSection ? counts[openSection] || 0 : 0;
+  const badgeFor = (item) => counts[sectionFromPath(item.to)] || 0;
+  // Opening a section (or sitting on it when something new arrives) clears its sidebar count.
+  useEffect(() => { if (openSection && openCount > 0) markSeen(openSection); }, [openSection, openCount, markSeen]);
   const page = nav.find((item) => item.to === pathname)?.label || 'Dashboard';
 
   useEffect(() => { setDrawer(false); setSearch(''); }, [pathname]);
@@ -53,7 +61,7 @@ export function PortalShell({ brand, nav, badges, groups = GROUPS, basePath = ''
 
   const sidebar = (compact) => (
     <>
-      <Link to={basePath || '/'} className="admin-brand" aria-label={`${brand.name} dashboard`}>
+      <Link to={brandTo || basePath || '/'} className="admin-brand" aria-label={brandLabel || `${brand.name} dashboard`}>
         <BrandMark size={40} />
         {!compact && <BrandName name={brand.name} caption={brand.caption} dark />}
       </Link>
@@ -65,7 +73,7 @@ export function PortalShell({ brand, nav, badges, groups = GROUPS, basePath = ''
               <NavLink key={item.to} to={item.to} end={item.end} title={compact ? item.label : undefined} aria-label={compact ? item.label : undefined} className={({ isActive }) => cx('admin-nav-link', isActive && 'is-active')}>
                 <item.icon aria-hidden="true" size={18} />
                 {!compact && <span>{item.label}</span>}
-                {!compact && badges?.[item.to] > 0 && <small>{badges[item.to] > 99 ? '99+' : badges[item.to]}</small>}
+                {!compact && badgeFor(item) > 0 && <small>{badgeFor(item) > 99 ? '99+' : badgeFor(item)}</small>}
               </NavLink>
             ))}
           </div>

@@ -17,6 +17,7 @@ import { ApiError } from '../../utils/ApiError.js';
 import { generatePassword } from '../../utils/slug.js';
 import { dateRangeFilter, mergeFilters, monthTrend, paginate, searchFilter } from '../../utils/query.js';
 import { teacherCourseIds, teacherStudentIds } from '../../services/scope.js';
+import { queueMail } from '../../services/mail/index.js';
 import { enrollStudent, refreshStudentStatus } from '../enrollments/enrollment.service.js';
 
 const toIds = (list) => list.map((id) => new mongoose.Types.ObjectId(String(id)));
@@ -109,6 +110,8 @@ export async function createStudent(payload, actor) {
     });
     if (payload.status === 'pending') await User.updateOne({ _id: student._id }, { status: 'pending' });
   }
+
+  queueMail(student, 'studentCredentials', { email, password: tempPassword });
 
   const [full] = await attachEnrollments([await User.findById(student._id)]);
   return { student: full, tempPassword, createdBy: actor.id };
@@ -285,6 +288,18 @@ export async function roster(actor, query) {
   const valid = items.filter((e) => e.student && e.course);
   const stats = await classStatsFor(valid);
   return { items: valid.map((e, i) => ({ ...e.toJSON(), classes: stats[i] })), meta };
+}
+
+// Enrollment rows for the chosen ids, limited to what this teacher (or admin) is allowed to see.
+export async function rosterByIds(actor, ids) {
+  const valid = ids.filter((id) => /^[a-f\d]{24}$/i.test(id));
+  const items = await Enrollment.find(mergeFilters(await rosterScope(actor), { _id: { $in: valid } }))
+    .populate('student', 'name email phone studentCode')
+    .populate('course', 'title')
+    .populate('batch', 'name');
+  const rows = items.filter((e) => e.student && e.course);
+  const stats = await classStatsFor(rows);
+  return rows.map((e, i) => ({ ...e.toJSON(), classes: stats[i] }));
 }
 
 export async function rosterSummary(actor) {

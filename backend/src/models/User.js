@@ -55,6 +55,8 @@ const userSchema = new Schema(
     about: String,
     studentCode: { type: String, index: true, sparse: true },
     mustChangePassword: { type: Boolean, default: false },
+    emailVerified: { type: Boolean, default: true },
+    passwordChangedAt: Date,
     lastActiveAt: Date,
     teacher: teacherProfileSchema,
   },
@@ -68,7 +70,10 @@ userSchema.pre('save', async function hashPassword(next) {
     const seq = await nextSequence('student');
     this.studentCode = `STU${String(seq).padStart(5, '0')}`;
   }
-  if (this.isModified('password')) this.password = await bcrypt.hash(this.password, 10);
+  if (this.isModified('password')) {
+    this.password = await bcrypt.hash(this.password, 10);
+    if (!this.isNew) this.passwordChangedAt = new Date();
+  }
   next();
 });
 

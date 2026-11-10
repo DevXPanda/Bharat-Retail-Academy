@@ -6,7 +6,7 @@ import {
 } from '../components/ui.jsx';
 
 export default function Support() {
-  const list = useListState({ status: 'all', category: 'all' }, { limit: 8 });
+  const list = useListState({ status: 'all', category: 'all', from: 'all' }, { limit: 8 });
   const [selectedId, setSelectedId] = useState(null);
 
   const summary = useGet('/tickets/summary', undefined, { refetchInterval: 30000 }).data;
@@ -22,7 +22,7 @@ export default function Support() {
 
   const columns = [
     indexColumn(meta),
-    { key: 'student', header: 'Student', render: (t) => <PersonCell name={t.student?.name} src={t.student?.avatar} sub={`#${t.ticketNumber}`} size={34} /> },
+    { key: 'student', header: 'Requested by', render: (t) => <PersonCell name={t.student?.name} src={t.student?.avatar} sub={`#${t.ticketNumber} · ${t.requesterRole === 'teacher' ? 'Teacher' : 'Student'}`} size={34} /> },
     {
       key: 'subject',
       header: 'Subject',
@@ -35,7 +35,7 @@ export default function Support() {
 
   return (
     <>
-      <PageHeader title="Support Tickets" subtitle="Answer student questions about payments, access, classes and certificates." />
+      <PageHeader title="Support Tickets" subtitle="Resolve student and teacher tickets. Each ticket shows the related record and recent history." />
 
       <StatGrid cols={4}>
         <StatCard icon={Headset} tone="blue" label="Total Tickets" value={summary?.total.value ?? '—'} trend={summary?.total.trend} />
@@ -47,6 +47,7 @@ export default function Support() {
       <div className="portal-workspace">
         <TableCard tabs={<Tabs tabs={tabs} value={list.filters.status} onChange={(v) => list.setFilter('status', v)} />}>
           <FilterBar search={list.filters.search} onSearch={(v) => list.setFilter('search', v)} searchPlaceholder="Search by subject or ticket number..." onReset={list.reset}>
+            <FilterSelect value={list.filters.from} onChange={(v) => list.setFilter('from', v)} allLabel="Students & Teachers" options={[{ value: 'student', label: 'Students' }, { value: 'teacher', label: 'Teachers' }]} className="w-48" />
             <FilterSelect value={list.filters.category} onChange={(v) => list.setFilter('category', v)} allLabel="All Categories" options={Object.entries(TICKET_CATEGORY_LABELS).map(([value, label]) => ({ value, label }))} className="w-44" />
           </FilterBar>
           <DataTable columns={columns} rows={rows} loading={isLoading} error={error} onRetry={refetch} onRowClick={(t) => setSelectedId(t.id)} minWidth={640} />

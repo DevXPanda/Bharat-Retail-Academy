@@ -21,6 +21,42 @@ router.get(
   }),
 );
 
+// Per-section sidebar state. `counts` drives the sidebar badges (cleared when the section is opened);
+// `unread` lists the row refs still waiting to be opened (shown as green rows until the user views them).
+router.get(
+  '/sections',
+  asyncHandler(async (req, res) => {
+    const rows = await Notification.find({ user: req.user._id, section: { $exists: true, $ne: null }, read: false }).select('section ref seen').limit(500).lean();
+    const counts = {};
+    const unread = {};
+    rows.forEach((n) => {
+      if (!n.seen) counts[n.section] = (counts[n.section] || 0) + 1;
+      if (n.ref) (unread[n.section] ||= []).push(n.ref);
+    });
+    ok(res, { counts, unread });
+  }),
+);
+
+const sectionParam = z.object({ section: z.string().regex(/^[a-z-]{2,40}$/) });
+
+router.patch(
+  '/sections/:section/seen',
+  validate({ params: sectionParam }),
+  asyncHandler(async (req, res) => {
+    await Notification.updateMany({ user: req.user._id, section: req.params.section, seen: false }, { seen: true });
+    noContent(res);
+  }),
+);
+
+router.patch(
+  '/sections/:section/read',
+  validate({ params: sectionParam, body: z.object({ ref: z.string().min(1).max(64) }) }),
+  asyncHandler(async (req, res) => {
+    await Notification.updateMany({ user: req.user._id, section: req.params.section, ref: req.body.ref, read: false }, { read: true, seen: true });
+    noContent(res);
+  }),
+);
+
 router.patch(
   '/read-all',
   asyncHandler(async (req, res) => {

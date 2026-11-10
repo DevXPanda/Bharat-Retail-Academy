@@ -6,7 +6,7 @@ import { validate } from '../../middleware/validate.js';
 import { asyncHandler } from '../../utils/asyncHandler.js';
 import { created, ok } from '../../utils/response.js';
 import { collectPages, listQuerySchema } from '../../utils/query.js';
-import { sendCsv } from '../../utils/csv.js';
+import { sendExcel } from '../../utils/excel.js';
 import { formatDate } from '../../utils/format.js';
 import * as service from './payouts.service.js';
 
@@ -56,22 +56,22 @@ router.get(
   validate({ query: listQuery }),
   asyncHandler(async (req, res) => {
     const items = await collectPages((page, limit) => service.listPayouts(req.user, { ...req.query, page, limit }));
-    sendCsv(
-      res,
-      'payouts.csv',
-      [
+    await sendExcel(res, {
+      filename: 'payouts.xlsx',
+      title: 'Teacher payouts report',
+      rows: items,
+      columns: [
         { label: 'Teacher', value: (p) => p.teacher?.name },
         { label: 'Email', value: (p) => p.teacher?.email },
         { label: 'Period', value: (p) => p.periodLabel },
         { label: 'Classes', value: (p) => p.classesConducted },
-        { label: 'Earnings', value: (p) => p.earnings },
-        { label: 'Payout Amount', value: (p) => p.amount },
+        { label: 'Earnings', value: (p) => p.earnings, format: 'currency', total: true },
+        { label: 'Payout Amount', value: (p) => p.amount, format: 'currency', total: true },
         { label: 'Method', value: (p) => p.method },
         { label: 'Status', value: (p) => p.status },
         { label: 'Payout Date', value: (p) => formatDate(p.payoutDate) },
       ],
-      items,
-    );
+    });
   }),
 );
 

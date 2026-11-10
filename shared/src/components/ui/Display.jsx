@@ -3,7 +3,7 @@ import { cx, initials } from '../../lib/format.js';
 import { badgeClass, statusMeta } from '../../lib/tones.js';
 
 export function Badge({ tone = 'slate', children, className }) {
-  return <span className={cx('inline-flex items-center whitespace-nowrap rounded-md px-2.5 py-1 text-xs font-semibold', badgeClass(tone), className)}>{children}</span>;
+  return <span className={cx('inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold leading-none', badgeClass(tone), className)}>{children}</span>;
 }
 
 export function StatusBadge({ status, tone, label, className }) {

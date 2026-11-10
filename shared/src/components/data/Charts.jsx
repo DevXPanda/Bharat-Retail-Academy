@@ -81,7 +81,7 @@ export function TrendChart({ data, xKey = 'label', series, height = 260, currenc
               </linearGradient>
             ))}
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e8eef8" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
           <XAxis dataKey={xKey} tick={axis} tickLine={false} axisLine={false} />
           <YAxis tick={axis} tickLine={false} axisLine={false} tickFormatter={(v) => (currency ? `₹${formatCompact(v)}` : formatCompact(v))} width={currency ? 56 : 40} />
           <Tooltip content={<ChartTooltip currency={currency} />} />
@@ -100,7 +100,7 @@ export function BarsChart({ data, xKey = 'label', series, height = 260, currency
     <div style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} layout={vertical ? 'vertical' : 'horizontal'} margin={{ top: 8, right: 8, left: vertical ? 24 : -8, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e8eef8" horizontal={!vertical} vertical={vertical} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={!vertical} vertical={vertical} />
           {vertical ? (
             <>
               <XAxis type="number" tick={axis} tickLine={false} axisLine={false} />

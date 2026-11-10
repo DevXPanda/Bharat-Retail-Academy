@@ -12,7 +12,7 @@ const settingSchema = new Schema(
     platformFeePercent: { type: Number, default: 10, min: 0, max: 90 },
     businessName: { type: String, default: 'Bharat Retail Academy' },
     gstin: { type: String, default: '' },
-    supportEmail: { type: String, default: 'support@ecomedu.in' },
+    supportEmail: { type: String, default: 'support@bharatretailacademy.com' },
     supportPhone: { type: String, default: '+91 98765 43210' },
     supportHours: { type: String, default: 'Mon - Sat, 10:00 AM - 7:00 PM IST' },
     address: { type: String, default: 'Connaught Place, New Delhi - 110001, India' },

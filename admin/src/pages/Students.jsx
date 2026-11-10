@@ -177,7 +177,7 @@ export default function Students() {
 
   const setStatus = useAction((s, status) => client.patch(`/students/${s.id}`, { status }), { success: 'Status updated', invalidate: ['/students', '/dashboard'] });
   const remove = useAction((s) => client.delete(`/students/${s.id}`), { success: 'Student deleted', invalidate: ['/students', '/dashboard'], onSuccess: () => setDeleting(null) });
-  const exportCsv = useAction(() => client.download('/students/export', 'students.csv', { status: list.filters.status === 'all' ? undefined : list.filters.status, search: list.params.search || undefined }), { success: 'Export started' });
+  const exportCsv = useAction(() => client.download('/students/export', 'students.xlsx', { status: list.filters.status === 'all' ? undefined : list.filters.status, search: list.params.search || undefined }), { success: 'Export started' });
 
   const tabs = [
     { key: 'all', label: 'All Students', count: summary?.total.value },

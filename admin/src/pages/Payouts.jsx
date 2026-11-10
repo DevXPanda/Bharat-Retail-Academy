@@ -65,7 +65,7 @@ export default function Payouts() {
   const { data: rows = [], meta, isLoading, error, refetch } = useGet('/payouts', list.params, { keepPrevious: true });
 
   const retry = useAction((p) => client.post(`/payouts/${p.id}/retry`), { success: 'Payout moved back to pending', invalidate: ['/payouts'] });
-  const exportCsv = useAction(() => client.download('/payouts/export', 'payouts.csv', { status: list.filters.status === 'all' ? undefined : list.filters.status }), { success: 'Export started' });
+  const exportCsv = useAction(() => client.download('/payouts/export', 'payouts.xlsx', { status: list.filters.status === 'all' ? undefined : list.filters.status }), { success: 'Export started' });
 
   const tabs = [
     { key: 'all', label: 'All Payouts', count: meta && list.filters.status === 'all' ? meta.total : undefined },

@@ -66,7 +66,7 @@ export default function Payments() {
   const courses = useGet('/courses/options').data || [];
   const { data: rows = [], meta, isLoading, error, refetch } = useGet('/payments', list.params, { keepPrevious: true });
 
-  const exportCsv = useAction(() => client.download('/payments/export', 'payments.csv', { status: list.filters.status === 'all' ? undefined : list.filters.status, from: list.filters.from || undefined, to: list.filters.to || undefined }), { success: 'Export started' });
+  const exportCsv = useAction(() => client.download('/payments/export', 'payments.xlsx', { status: list.filters.status === 'all' ? undefined : list.filters.status, from: list.filters.from || undefined, to: list.filters.to || undefined }), { success: 'Export started' });
 
   const tabs = [
     { key: 'all', label: 'All Transactions' },

@@ -49,16 +49,11 @@ export default function MyStudents() {
     { success: (n) => `Message sent to ${n} student${n === 1 ? '' : 's'}`, invalidate: ['/conversations'], onSuccess: () => { setMessaging(false); setText(''); setSelected([]); } },
   );
 
+  const exportExcel = useAction(() => client.download('/students/roster/export', 'my-students.xlsx', { ids: chosen.map((e) => e.id).join(',') }), { success: 'Excel file downloaded' });
+
   const applyBulk = (action) => {
     if (action === 'message') return setMessaging(true);
-    const head = ['Student ID', 'Name', 'Email', 'Phone', 'Course', 'Batch', 'Joined', 'Progress %', 'Classes attended', 'Status'];
-    const body = chosen.map((e) => [e.student.studentCode, e.student.name, e.student.email, e.student.phone, e.course.title, e.batch?.name, formatDate(e.createdAt), e.progress, `${e.classes.attended}/${e.classes.total}`, e.status]);
-    const csv = [head, ...body].map((r) => r.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
-    link.download = 'my-students.csv';
-    link.click();
-    URL.revokeObjectURL(link.href);
+    exportExcel.run();
     return undefined;
   };
 
@@ -121,7 +116,7 @@ export default function MyStudents() {
         {tab === 'overview' && (
           <div className="p-5">
             <h4 className="mb-3 text-sm font-bold text-ink">Students per course</h4>
-            <BarsChart data={groups} xKey="name" layout="vertical" height={Math.max(220, groups.length * 54)} series={[{ key: 'students', label: 'Students', color: '#2f6df3' }, { key: 'completed', label: 'Completed', color: '#22c55e' }]} />
+            <BarsChart data={groups} xKey="name" layout="vertical" height={Math.max(220, groups.length * 54)} series={[{ key: 'students', label: 'Students', color: '#2563eb' }, { key: 'completed', label: 'Completed', color: '#2d725e' }]} />
           </div>
         )}
       </TableCard>

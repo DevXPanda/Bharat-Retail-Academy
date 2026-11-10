@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { BRAND, PortalShell, ProtectedRoute, StaffLogin, useGet } from '@ecomedu/ui';
+import { BRAND, PortalShell, ProtectedRoute, StaffLogin } from '@ecomedu/ui';
 import { NAV } from './nav.js';
 import Dashboard from './pages/Dashboard.jsx';
 import MyClasses from './pages/MyClasses.jsx';
@@ -10,12 +10,12 @@ import Messages from './pages/Messages.jsx';
 import Earnings from './pages/Earnings.jsx';
 import Profile from './pages/Profile.jsx';
 import Assignments from './pages/Assignments.jsx';
+import Support from './pages/Support.jsx';
 
 const PORTAL = { name: BRAND.name, caption: 'Teacher Portal' };
 
 function Shell() {
-  const summary = useGet('/conversations/summary', undefined, { refetchInterval: 60000 });
-  return <div className="teacher-portal"><PortalShell brand={PORTAL} nav={NAV} groups={[{ title: 'Overview', paths: ['/'] }, { title: 'Teaching', paths: ['/classes', '/live-classes', '/students', '/attendance', '/assignments'] }, { title: 'Account', paths: ['/messages', '/earnings', '/profile'] }]} badges={{ '/messages': summary.data?.unread?.value || 0 }} searchPlaceholder="Search classes, students, materials..." searchHome="/students" profilePath="/profile" roleLabel="Teacher" /></div>;
+  return <div className="teacher-portal"><PortalShell brand={PORTAL} nav={NAV} groups={[{ title: 'Overview', paths: ['/'] }, { title: 'Teaching', paths: ['/classes', '/live-classes', '/students', '/attendance', '/assignments'] }, { title: 'Account', paths: ['/messages', '/earnings', '/support', '/profile'] }]} searchPlaceholder="Search classes, students, materials..." searchHome="/students" profilePath="/profile" roleLabel="Teacher" /></div>;
 }
 
 export default function App() {
@@ -41,6 +41,7 @@ export default function App() {
           <Route path="attendance" element={<Attendance />} />
           <Route path="messages" element={<Messages />} />
           <Route path="earnings" element={<Earnings />} />
+          <Route path="support" element={<Support />} />
           <Route path="profile" element={<Profile />} />
           <Route path="assignments" element={<Assignments />} />
         </Route>

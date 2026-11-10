@@ -25,6 +25,7 @@ export default function App() {
         path="/login"
         element={
           <StaffLogin
+            illustration="teacher"
             brand={PORTAL}
             heading="Teacher sign in"
             tagline="Your classes and teaching schedule."

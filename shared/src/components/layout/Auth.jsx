@@ -5,6 +5,9 @@ import { useAuth, useClient } from '../../context/AppProviders.jsx';
 import { BrandMark, BrandName } from './Brand.jsx';
 import { Button } from '../ui/Button.jsx';
 import { Field, Input } from '../ui/Form.jsx';
+import teacherIllustration from '../../illustrations/teacher-login.svg';
+import adminIllustration from '../../illustrations/admin-login.svg';
+import '../../styles/staff-auth.css';
 
 export function ProtectedRoute({ redirectTo = '/login' }) {
   const { user } = useAuth();
@@ -25,7 +28,7 @@ export function PasswordInput({ value, onChange, placeholder = 'Enter your passw
   );
 }
 
-export function StaffLogin({ brand, heading, tagline, points = [], redirectTo = '/', forgotPath }) {
+export function StaffLogin({ brand, heading, tagline, points = [], redirectTo = '/', forgotPath, illustration = 'teacher' }) {
   const { user, login } = useAuth();
   const location = useLocation();
   const [form, setForm] = useState({ email: '', password: '' });
@@ -47,59 +50,31 @@ export function StaffLogin({ brand, heading, tagline, points = [], redirectTo = 
     }
   };
 
+  const isAdmin = illustration === 'admin';
   return (
-    <div className="grid min-h-screen lg:grid-cols-[1.05fr_1fr]">
-      <div className="relative hidden overflow-hidden bg-navy-900 p-12 text-white lg:flex lg:flex-col lg:justify-between">
-        <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-brand-600/30 blur-3xl" />
-        <div className="absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-violet-600/20 blur-3xl" />
-        <div className="relative flex items-center gap-3">
-          <BrandMark size={46} />
-          <BrandName name={brand.name} caption={brand.caption} dark />
+    <div className={`staff-login staff-login-${illustration}`}>
+      <aside className="staff-login-aside">
+        <div className="staff-login-scene">
+          <img src={isAdmin ? adminIllustration : teacherIllustration} alt={isAdmin ? 'An academy coordinator organising courses and class schedules at a desk.' : 'A teacher explaining a lesson beside a classroom board.'} width="620" height="460" />
+          <div className="staff-login-intro"><h2>{isAdmin ? 'Your academy, in good order.' : 'Make room for good teaching.'}</h2><p>{tagline}</p></div>
+          {points.length > 0 && <ul className="staff-login-features">{points.map((point) => <li key={point}>{point}</li>)}</ul>}
         </div>
-        <div className="relative max-w-md">
-          <h2 className="text-4xl font-extrabold leading-tight">{heading}</h2>
-          <p className="mt-4 text-base text-slate-300">{tagline}</p>
-          <ul className="mt-8 space-y-3">
-            {points.map((p) => (
-              <li key={p} className="flex items-center gap-3 text-sm text-slate-200">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-400" />
-                {p}
-              </li>
-            ))}
-          </ul>
+        <p className="staff-login-copyright">&copy; {new Date().getFullYear()} {brand.name}</p>
+      </aside>
+      <main className="staff-login-main">
+        <div className="staff-login-card">
+          <div className="staff-login-brand"><BrandMark size={64} /><span>{brand.name}</span></div>
+          <div className="staff-login-heading"><h1>{heading || 'Welcome back'}</h1><p>Sign in with your academy account.</p></div>
+          <form onSubmit={submit} className="staff-login-form">
+            {error && <p className="staff-login-error" role="alert">{error}</p>}
+            <Field label="Email address" required><Input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" autoComplete="username" /></Field>
+            <Field label="Password" required><PasswordInput value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required /></Field>
+            {forgotPath && <div className="staff-login-forgot"><Link to={forgotPath}>Forgot password?</Link></div>}
+            <Button type="submit" size="lg" loading={loading} className="staff-login-submit">Sign in</Button>
+          </form>
+          <p className="staff-login-note">{isAdmin ? 'For authorised academy administrators.' : 'Your classes, students and teaching resources.'}</p>
         </div>
-        <p className="relative text-xs text-slate-400">© {new Date().getFullYear()} {brand.name}. All rights reserved.</p>
-      </div>
-
-      <div className="flex items-center justify-center px-6 py-12">
-        <form onSubmit={submit} className="w-full max-w-md space-y-5">
-          <div className="mb-2 flex items-center gap-3 lg:hidden">
-            <BrandMark size={42} />
-            <BrandName name={brand.name} caption={brand.caption} />
-          </div>
-          <div>
-            <h1 className="text-3xl font-extrabold text-ink">Welcome back</h1>
-            <p className="mt-1.5 text-sm text-slate-500">Sign in to continue to the {brand.caption?.toLowerCase() || 'portal'}.</p>
-          </div>
-          {error && <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-sm text-red-600" role="alert">{error}</p>}
-          <Field label="Email address" required>
-            <div className="relative">
-              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder="you@example.com" autoComplete="username" className="pl-9" />
-            </div>
-          </Field>
-          <Field label="Password" required>
-            <div className="relative">
-              <Lock className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <PasswordInput value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required className="pl-9" />
-            </div>
-          </Field>
-          {forgotPath && <div className="-mt-2 text-right"><Link to={forgotPath} className="text-sm font-medium text-brand-700 hover:underline">Forgot password?</Link></div>}
-          <Button type="submit" size="lg" loading={loading} className="w-full">
-            Sign in
-          </Button>
-        </form>
-      </div>
+      </main>
     </div>
   );
 }

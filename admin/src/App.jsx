@@ -35,6 +35,7 @@ export default function App() {
         path="/login"
         element={
           <StaffLogin
+            illustration="admin"
             brand={PORTAL}
             forgotPath="/forgot-password"
             heading="Admin sign in"

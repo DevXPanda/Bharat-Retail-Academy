@@ -13,9 +13,9 @@ const settingSchema = new Schema(
     businessName: { type: String, default: 'Bharat Retail Academy' },
     gstin: { type: String, default: '' },
     supportEmail: { type: String, default: 'support@bharatretailacademy.com' },
-    supportPhone: { type: String, default: '+91 98765 43210' },
+    supportPhone: { type: String, default: '+91 88106 94078' },
     supportHours: { type: String, default: 'Mon - Sat, 10:00 AM - 7:00 PM IST' },
-    address: { type: String, default: 'Connaught Place, New Delhi - 110001, India' },
+    address: { type: String, default: 'D-375, Ganesh Nagar, Pandav Nagar Complex, New Delhi - 110092' },
     social: {
       facebook: { type: String, default: '' },
       instagram: { type: String, default: '' },

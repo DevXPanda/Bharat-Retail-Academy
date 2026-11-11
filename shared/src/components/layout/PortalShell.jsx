@@ -13,6 +13,7 @@ const GROUPS = [
   { title: 'Learning', paths: ['/students', '/teachers', '/courses', '/batches', '/live-classes', '/attendance', '/recordings', '/assignments', '/certificates'] },
   { title: 'Business', paths: ['/payments', '/payouts', '/reports'] },
   { title: 'Communication', paths: ['/messages', '/reviews', '/leads', '/support', '/blog'] },
+  { title: 'Settings', paths: ['/settings'] },
 ];
 
 export function PortalShell({ brand, nav, groups = GROUPS, basePath = '', searchHome = '/students', profilePath, roleLabel = 'Admin', searchPlaceholder, brandTo, brandLabel }) {

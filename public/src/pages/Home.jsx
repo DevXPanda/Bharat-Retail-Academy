@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ArrowUpRight, Award, CalendarDays, Clock, LayoutGrid, Mail, Phone, Star } from 'lucide-react';
-import { Avatar, Button, EmptyState, ErrorState, Field, Input, Modal, Select, Spinner, formatDate, formatTime, useAction, useAuth, useClient, useGet, BRAND, BrandMark } from '@ecomedu/ui';
+import { Avatar, Button, EmptyState, ErrorState, Field, Input, Modal, Select, Spinner, formatDate, formatTime, useAction, useAuth, useClient, useGet, cleanParams, BRAND, BrandMark } from '@ecomedu/ui';
 import CourseCard from '../components/CourseCard.jsx';
 import { PlatformLogo } from '../components/PlatformLogo.jsx';
 import { useAuthModal } from '../components/AuthModal.jsx';
@@ -78,10 +78,65 @@ function PlatformStrip() {
   );
 }
 
+const PAGE_SIZE = 6;
+
 function CourseCatalog() {
   const [category, setCategory] = useState('all');
   const categories = useGet('/public/categories').data || [];
-  const courses = useGet('/public/courses', { limit: 6, category, sort: 'popular' });
+  const client = useClient();
+  const [items, setItems] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState('');
+  const [nonce, setNonce] = useState(0);
+  const sentinel = useRef(null);
+  const busy = useRef(false);
+
+  // Reset the list whenever the platform filter changes.
+  useEffect(() => {
+    setItems([]);
+    setPage(1);
+    setHasMore(true);
+    setError('');
+    setLoading(true);
+    busy.current = false;
+  }, [category]);
+
+  // Fetch the current page and append it.
+  useEffect(() => {
+    let cancelled = false;
+    busy.current = true;
+    if (page > 1) setLoadingMore(true);
+    client.get('/public/courses', cleanParams({ limit: PAGE_SIZE, page, category, sort: 'popular' }))
+      .then((res) => {
+        if (cancelled) return;
+        const rows = res.data || [];
+        setItems((prev) => (page === 1 ? rows : [...prev, ...rows.filter((r) => !prev.some((p) => p.id === r.id))]));
+        setHasMore(page < (res.meta?.pages ?? 1) && rows.length > 0);
+        setError('');
+      })
+      .catch((err) => { if (!cancelled) setError(err.message || 'Could not load courses'); })
+      .finally(() => { if (!cancelled) { setLoading(false); setLoadingMore(false); busy.current = false; } });
+    return () => { cancelled = true; };
+  }, [client, category, page, nonce]);
+
+  // Load the next page when the sentinel scrolls into view.
+  useEffect(() => {
+    const node = sentinel.current;
+    if (!node || !hasMore || error) return undefined;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !busy.current) {
+        busy.current = true;
+        setPage((p) => p + 1);
+      }
+    }, { rootMargin: '400px' });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasMore, error, items.length]);
+
+  const retry = () => { setError(''); setLoading(page === 1); setNonce((n) => n + 1); };
   return (
     <section className="public-container home-block" id="courses">
       <div className="section-heading"><div><h2>A new skill. A good place to start.</h2><p className="section-description">Choose what you want to work on. Take it one lesson at a time.</p></div><Link to="/courses" className="text-link">Browse all courses <ArrowRight className="h-4 w-4" /></Link></div>
@@ -89,7 +144,14 @@ function CourseCatalog() {
         <button type="button" aria-pressed={category === 'all'} onClick={() => setCategory('all')} className={category === 'all' ? 'selected' : ''}><LayoutGrid className="h-5 w-5" /><span>All courses</span></button>
         {categories.map((c) => <button key={c.name} type="button" aria-pressed={category === c.name} onClick={() => setCategory(c.name)} className={category === c.name ? 'selected' : ''}><PlatformLogo category={c.name} size={26} /><span>{c.name}</span><small>{c.count}</small></button>)}
       </div>
-      {courses.isLoading ? <div className="flex justify-center py-14"><Spinner /></div> : courses.error ? <ErrorState message={courses.error} onRetry={courses.refetch} /> : !courses.data?.length ? <EmptyState title="No courses in this category yet" /> : <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{courses.data.map((course) => <CourseCard key={course.id} course={course} />)}</div>}
+      {loading ? <div className="flex justify-center py-14"><Spinner /></div> : error && !items.length ? <ErrorState message={error} onRetry={retry} /> : !items.length ? <EmptyState title="No courses in this category yet" /> : (
+        <>
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">{items.map((course) => <CourseCard key={course.id} course={course} />)}</div>
+          {error && <ErrorState message={error} onRetry={retry} />}
+          {loadingMore && <div className="flex justify-center py-8"><Spinner /></div>}
+          {hasMore && !error && <div ref={sentinel} aria-hidden="true" style={{ height: 1 }} />}
+        </>
+      )}
     </section>
   );
 }
